@@ -1,5 +1,9 @@
 package ffprobe
 
+import (
+	"time"
+)
+
 type StreamType string
 
 const (
@@ -14,17 +18,17 @@ type ProbeData struct {
 }
 
 type Format struct {
-	Filename       string      `json:"filename"`
-	NBStreams      int         `json:"nb_streams"`
-	NBPrograms     int         `json:"nb_programs"`
-	FormatName     string      `json:"format_name"`
-	FormatLongName string      `json:"format_long_name"`
-	StartTime      string      `json:"start_time"`
-	Duration       string      `json:"duration"`
-	Size           string      `json:"size"`
-	BitRate        string      `json:"bit_rate"`
-	ProbeScore     int         `json:"probe_score"`
-	Tags           *FormatTags `json:"tags"`
+	Filename         string      `json:"filename"`
+	NBStreams        int         `json:"nb_streams"`
+	NBPrograms       int         `json:"nb_programs"`
+	FormatName       string      `json:"format_name"`
+	FormatLongName   string      `json:"format_long_name"`
+	StartTimeSeconds float64     `json:"start_time,string"`
+	DurationSeconds  float64     `json:"duration,string"`
+	Size             string      `json:"size"`
+	BitRate          string      `json:"bit_rate"`
+	ProbeScore       int         `json:"probe_score"`
+	Tags             *FormatTags `json:"tags"`
 }
 
 type FormatTags struct {
@@ -89,6 +93,14 @@ type StreamTags struct {
 	CreationTime string `json:"creation_time,omitempty"`
 	Language     string `json:"language,omitempty"`
 	Encoder      string `json:"encoder,omitempty"`
+}
+
+func (f *Format) StartTime() (duration time.Duration) {
+	return time.Duration(f.StartTimeSeconds * float64(time.Second))
+}
+
+func (f *Format) Duration() (duration time.Duration) {
+	return time.Duration(f.DurationSeconds * float64(time.Second))
 }
 
 func (p *ProbeData) GetStreams(streamType StreamType) (streams []Stream) {

@@ -19,4 +19,7 @@ func main() {
 
 	buf, err = json.MarshalIndent(data.GetFirstVideoStream(), "", "  ")
 	log.Print(string(buf))
+
+	log.Printf("\nDuration: %v\n", data.Format.Duration())
+	log.Printf("\nStartTime: %v\n", data.Format.StartTime())
 }
