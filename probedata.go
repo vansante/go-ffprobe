@@ -94,6 +94,7 @@ type StreamTags struct {
 	CreationTime string `json:"creation_time,omitempty"`
 	Language     string `json:"language,omitempty"`
 	Encoder      string `json:"encoder,omitempty"`
+	Location     string `json:"location,omitempty"`
 }
 
 func (f *Format) StartTime() (duration time.Duration) {
