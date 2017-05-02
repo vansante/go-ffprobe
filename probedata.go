@@ -90,6 +90,7 @@ type StreamDisposition struct {
 }
 
 type StreamTags struct {
+	Rotate       int    `json:"rotate,string,omitempty"`
 	CreationTime string `json:"creation_time,omitempty"`
 	Language     string `json:"language,omitempty"`
 	Encoder      string `json:"encoder,omitempty"`
