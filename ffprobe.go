@@ -2,8 +2,11 @@ package ffprobe
 
 import (
 	"encoding/json"
+	"errors"
 	"os/exec"
 )
+
+var ErrBinNotFound error = errors.New("ffprobe bin not found")
 
 var binPath string = "ffprobe"
 
@@ -23,6 +26,9 @@ func GetVideoData(filePath string) (data *ProbeData, err error) {
 
 	outputBuf, err := cmd.Output()
 	if err != nil {
+		if err == exec.ErrNotFound {
+			err = ErrBinNotFound
+		}
 		return
 	}
 
