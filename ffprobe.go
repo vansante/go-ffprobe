@@ -1,11 +1,11 @@
 package ffprobe
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
 	"os/exec"
 	"time"
-	"bytes"
 )
 
 var ErrBinNotFound error = errors.New("ffprobe bin not found")
