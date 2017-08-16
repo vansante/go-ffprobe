@@ -10,7 +10,7 @@ import (
 func main() {
 	path := "D:/Downloads/videorientation.mp4"
 
-	data, err := ffprobe.GetVideoData(path, 500 * time.Millisecond)
+	data, err := ffprobe.GetProbeData(path, 500 * time.Millisecond)
 	if err != nil {
 		log.Panicf("Error getting data: %v", err)
 	}
@@ -26,7 +26,7 @@ func main() {
 
 	//start := time.Now()
 	//for i := 0; i < 100; i++ {
-	//	_, err = ffprobe.GetVideoData(path)
+	//	_, err = ffprobe.GetProbeData(path)
 	//	if err != nil {
 	//		log.Panicf("Error getting data: %v", err)
 	//	}

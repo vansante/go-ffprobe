@@ -17,12 +17,12 @@ func SetFFProbeBinPath(newBinPath string) {
 	binPath = newBinPath
 }
 
-func GetVideoData(filePath string, timeout time.Duration) (data *ProbeData, err error) {
+func GetProbeData(filePath string, timeout time.Duration) (data *ProbeData, err error) {
 	cmd := exec.Command(
 		binPath,
 		"-v", "quiet",
 		"-print_format", "json",
-		"-show_format",
+		"-show_format",	
 		"-show_streams",
 		filePath,
 	)
