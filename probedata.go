@@ -10,6 +10,7 @@ const (
 	STREAM_ANY   StreamType = ""
 	STREAM_VIDEO            = "video"
 	STREAM_AUDIO            = "audio"
+	STREAM_SUBTITLE         = "subtitle"
 )
 
 type ProbeData struct {
@@ -141,6 +142,19 @@ func (p *ProbeData) GetFirstAudioStream() (str *Stream) {
 			continue
 		}
 		if s.CodecType == STREAM_AUDIO {
+			str = s
+			return
+		}
+	}
+	return
+}
+
+func (p *ProbeData) GetFirstSubtitleStream() (str *Stream) {
+	for _, s := range p.Streams {
+		if s == nil {
+			continue
+		}
+		if s.CodecType == STREAM_SUBTITLE {
 			str = s
 			return
 		}
