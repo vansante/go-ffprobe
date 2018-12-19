@@ -4,20 +4,39 @@ import (
 	"time"
 )
 
+// StreamType represents a media stream type like video, audio, subtitles, etc
 type StreamType string
 
 const (
-	STREAM_ANY   StreamType = ""
-	STREAM_VIDEO            = "video"
-	STREAM_AUDIO            = "audio"
-	STREAM_SUBTITLE         = "subtitle"
+	// StreamAny means any type of stream
+	StreamAny StreamType = ""
+	// StreamVideo is a video stream
+	StreamVideo StreamType = "video"
+	// StreamAudio is an audio stream
+	StreamAudio StreamType = "audio"
+	// StreamSubtitle is a subtitle stream
+	StreamSubtitle StreamType = "subtitle"
 )
 
+// TODO: FIXME: We should remove the ALL_CAPS variants some time in the future (golint hates them)
+const (
+	// STREAM_ANY deprecated, use StreamAny
+	STREAM_ANY = StreamAny
+	// STREAM_VIDEO deprecated, use StreamVideo
+	STREAM_VIDEO = StreamVideo
+	// STREAM_AUDIO deprecated, use StreamAudio
+	STREAM_AUDIO = StreamAudio
+	// STREAM_SUBTITLE deprecated, use StreamSubtitle
+	STREAM_SUBTITLE = StreamSubtitle
+)
+
+// ProbeData is the root json data structure returned by an ffprobe.
 type ProbeData struct {
 	Streams []*Stream `json:"streams"`
 	Format  *Format   `json:"format"`
 }
 
+// Format is a json data structure to represent formats
 type Format struct {
 	Filename         string      `json:"filename"`
 	NBStreams        int         `json:"nb_streams"`
@@ -32,6 +51,7 @@ type Format struct {
 	Tags             *FormatTags `json:"tags"`
 }
 
+// FormatTags is a json data structure to represent format tags
 type FormatTags struct {
 	MajorBrand       string `json:"major_brand"`
 	MinorVersion     string `json:"minor_version"`
@@ -39,6 +59,8 @@ type FormatTags struct {
 	CreationTime     string `json:"creation_time"`
 }
 
+// Stream is a json data structure to represent streams.
+// A stream can be a video, audio, subtitle, etc type of stream.
 type Stream struct {
 	Index              int               `json:"index"`
 	CodecName          string            `json:"codec_name"`
@@ -76,6 +98,7 @@ type Stream struct {
 	BitsPerSample      int               `json:"bits_per_sample,omitempty"`
 }
 
+// StreamDisposition is a json data structure to represent stream dispositions
 type StreamDisposition struct {
 	Default         int `json:"default"`
 	Dub             int `json:"dub"`
@@ -90,6 +113,7 @@ type StreamDisposition struct {
 	AttachedPic     int `json:"attached_pic"`
 }
 
+// StreamTags is a json data structure to represent stream tags
 type StreamTags struct {
 	Rotate       int    `json:"rotate,string,omitempty"`
 	CreationTime string `json:"creation_time,omitempty"`
@@ -98,21 +122,24 @@ type StreamTags struct {
 	Location     string `json:"location,omitempty"`
 }
 
+// StartTime returns the start time of the media file as a time.Duration
 func (f *Format) StartTime() (duration time.Duration) {
 	return time.Duration(f.StartTimeSeconds * float64(time.Second))
 }
 
+// Duration returns the duration of the media file as a time.Duration
 func (f *Format) Duration() (duration time.Duration) {
 	return time.Duration(f.DurationSeconds * float64(time.Second))
 }
 
+// GetStreams returns all streams which are of the given type
 func (p *ProbeData) GetStreams(streamType StreamType) (streams []Stream) {
 	for _, s := range p.Streams {
 		if s == nil {
 			continue
 		}
 		switch streamType {
-		case STREAM_ANY:
+		case StreamAny:
 			streams = append(streams, *s)
 		default:
 			if s.CodecType == string(streamType) {
@@ -120,44 +147,44 @@ func (p *ProbeData) GetStreams(streamType StreamType) (streams []Stream) {
 			}
 		}
 	}
-	return
+	return streams
 }
 
+// GetFirstVideoStream returns the first video stream found
 func (p *ProbeData) GetFirstVideoStream() (str *Stream) {
 	for _, s := range p.Streams {
 		if s == nil {
 			continue
 		}
-		if s.CodecType == STREAM_VIDEO {
-			str = s
-			return
+		if s.CodecType == string(StreamVideo) {
+			return s
 		}
 	}
-	return
+	return nil
 }
 
+// GetFirstAudioStream returns the first audio stream found
 func (p *ProbeData) GetFirstAudioStream() (str *Stream) {
 	for _, s := range p.Streams {
 		if s == nil {
 			continue
 		}
-		if s.CodecType == STREAM_AUDIO {
-			str = s
-			return
+		if s.CodecType == string(StreamAudio) {
+			return s
 		}
 	}
-	return
+	return nil
 }
 
+// GetFirstSubtitleStream returns the first subtitle stream found
 func (p *ProbeData) GetFirstSubtitleStream() (str *Stream) {
 	for _, s := range p.Streams {
 		if s == nil {
 			continue
 		}
-		if s.CodecType == STREAM_SUBTITLE {
-			str = s
-			return
+		if s.CodecType == string(StreamSubtitle) {
+			return s
 		}
 	}
-	return
+	return nil
 }
