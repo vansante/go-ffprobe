@@ -3,15 +3,9 @@ version: 2.1
 executors:
   go:
     docker:
-      - image: circleci/golang:1.11
+      - image: circleci/golang:1.12
 
 jobs:
-  codequality:
-    executor: go
-    steps:
-      - checkout
-      - run: make verify
-
   test:
     executor: go
     steps:
@@ -26,5 +20,4 @@ workflows:
   version: 2
   main:
     jobs:
-      - codequality
       - test
