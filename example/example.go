@@ -22,9 +22,15 @@ func main() {
 	}
 
 	buf, err := json.MarshalIndent(data, "", "  ")
+	if err != nil {
+		log.Panicf("Error unmarshalling: %v", err)
+	}
 	log.Print(string(buf))
 
 	buf, err = json.MarshalIndent(data.GetFirstVideoStream(), "", "  ")
+	if err != nil {
+		log.Panicf("Error unmarshalling: %v", err)
+	}
 	log.Print(string(buf))
 
 	log.Printf("%v", data.GetStreams(ffprobe.StreamVideo))
