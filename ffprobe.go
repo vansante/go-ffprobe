@@ -25,7 +25,7 @@ func SetFFProbeBinPath(newBinPath string) {
 // GetProbeData is the main command used for probing the given media file using ffprobe.
 // A timeout can be provided to kill the process if it takes too long to determine
 // the files information.
-func GetProbeData(filePath string, ctx context.Context) (data *ProbeData, err error) {
+func GetProbeData(ctx context.Context, filePath string) (data *ProbeData, err error) {
 	cmd := exec.Command(
 		binPath,
 		"-v", "quiet",

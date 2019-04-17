@@ -17,9 +17,11 @@ func main() {
 	}
 	path := os.Args[1]
 
-	ctx, _ := context.WithTimeout(context.Background(), 500*time.Millisecond)
+	ctx, cancel := context.WithTimeout(context.Background(), 500*time.Millisecond)
 
-	data, err := ffprobe.GetProbeData(path, ctx)
+	defer cancel()
+
+	data, err := ffprobe.GetProbeData(ctx, path)
 	if err != nil {
 		log.Panicf("Error getting data: %v", err)
 	}
