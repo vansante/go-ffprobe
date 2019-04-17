@@ -2,10 +2,10 @@ package ffprobe
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"errors"
 	"os/exec"
-	"time"
 )
 
 var (
@@ -25,7 +25,7 @@ func SetFFProbeBinPath(newBinPath string) {
 // GetProbeData is the main command used for probing the given media file using ffprobe.
 // A timeout can be provided to kill the process if it takes too long to determine
 // the files information.
-func GetProbeData(filePath string, timeout time.Duration) (data *ProbeData, err error) {
+func GetProbeData(filePath string, ctx context.Context) (data *ProbeData, err error) {
 	cmd := exec.Command(
 		binPath,
 		"-v", "quiet",
@@ -51,7 +51,7 @@ func GetProbeData(filePath string, timeout time.Duration) (data *ProbeData, err 
 	}()
 
 	select {
-	case <-time.After(timeout):
+	case <-ctx.Done():
 		err = cmd.Process.Kill()
 		if err == nil {
 			return nil, ErrTimeout
