@@ -118,6 +118,7 @@ type StreamTags struct {
 	Rotate       int    `json:"rotate,string,omitempty"`
 	CreationTime string `json:"creation_time,omitempty"`
 	Language     string `json:"language,omitempty"`
+	Title        string `json:"title,omitempty"`
 	Encoder      string `json:"encoder,omitempty"`
 	Location     string `json:"location,omitempty"`
 }
