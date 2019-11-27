@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"os/exec"
 	"time"
 )
@@ -34,7 +35,7 @@ func GetProbeData(filePath string, timeout time.Duration) (data *ProbeData, err 
 	return GetProbeDataContext(ctx, filePath)
 }
 
-// GetProbeDataContext is the main command used for probing the given media file using ffprobe.
+// GetProbeDataContext is used for probing the given media file using ffprobe.
 // It takes a context to allow killing the ffprobe process if it takes too long or in case of shutdown.
 func GetProbeDataContext(ctx context.Context, filePath string) (data *ProbeData, err error) {
 	cmd := exec.Command(
@@ -78,6 +79,47 @@ func GetProbeDataContext(ctx context.Context, filePath string) (data *ProbeData,
 	err = json.Unmarshal(outputBuf.Bytes(), data)
 	if err != nil {
 		return data, err
+	}
+
+	return data, nil
+}
+
+// GetProbeDataOptions is used for probing the given media file using ffprobe, optionally taking in extra arguments for ffprobe.
+// It takes a context to allow killing the ffprobe process if it takes too long or in case of shutdown.
+func GetProbeDataOptions(ctx context.Context, file string, extraFFProbeOptions ...string) (data *ProbeData, err error) {
+	args := append([]string{
+		"-v", "quiet",
+		"-print_format", "json",
+		"-show_format",
+		"-show_streams",
+	}, extraFFProbeOptions...)
+	args = append(args, file)
+
+	cmd := exec.CommandContext(
+		ctx,
+		binPath,
+		args...
+	)
+
+	var outputBuf bytes.Buffer
+	var stdErr bytes.Buffer
+
+	cmd.Stdout = &outputBuf
+	cmd.Stderr = &stdErr
+
+	err = cmd.Run()
+	if err != nil {
+		return nil, fmt.Errorf("error running ffprobe [%s] %w", stdErr.String(), err)
+	}
+
+	if stdErr.String() != "" {
+		return nil, fmt.Errorf("ffprobe error: %s", stdErr.String())
+	}
+
+	data = &ProbeData{}
+	err = json.Unmarshal(outputBuf.Bytes(), data)
+	if err != nil {
+		return data, fmt.Errorf("error unmarshalling output: %w", err)
 	}
 
 	return data, nil
