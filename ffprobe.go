@@ -98,7 +98,7 @@ func GetProbeDataOptions(ctx context.Context, file string, extraFFProbeOptions .
 	cmd := exec.CommandContext(
 		ctx,
 		binPath,
-		args...
+		args...,
 	)
 
 	var outputBuf bytes.Buffer
