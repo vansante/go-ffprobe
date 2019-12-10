@@ -88,7 +88,7 @@ func GetProbeDataContext(ctx context.Context, filePath string) (data *ProbeData,
 // It takes a context to allow killing the ffprobe process if it takes too long or in case of shutdown.
 func GetProbeDataOptions(ctx context.Context, file string, extraFFProbeOptions ...string) (data *ProbeData, err error) {
 	args := append([]string{
-		"-v", "quiet",
+		"-loglevel", "fatal",
 		"-print_format", "json",
 		"-show_format",
 		"-show_streams",
