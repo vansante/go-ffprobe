@@ -1,4 +1,4 @@
-package ffprobe
+  package ffprobe
 
 import (
 	"bytes"
@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"os/exec"
 	"time"
 )
@@ -28,24 +29,25 @@ func SetFFProbeBinPath(newBinPath string) {
 // The timeout can be provided to kill the process if it takes too long to determine
 // the files information.
 // Note: It is probably better to use Context with GetProbeDataContext() these days as it is more flexible.
-func GetProbeData(filePath string, timeout time.Duration) (data *ProbeData, err error) {
+func GetProbeData(r io.Reader, timeout time.Duration) (data *ProbeData, err error) {
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
 
-	return GetProbeDataContext(ctx, filePath)
+	return GetProbeDataContext(ctx, r)
 }
 
 // GetProbeDataContext is used for probing the given media file using ffprobe.
 // It takes a context to allow killing the ffprobe process if it takes too long or in case of shutdown.
-func GetProbeDataContext(ctx context.Context, filePath string) (data *ProbeData, err error) {
+func GetProbeDataContext(ctx context.Context, r io.Reader) (data *ProbeData, err error) {
 	cmd := exec.Command(
 		binPath,
 		"-v", "quiet",
 		"-print_format", "json",
 		"-show_format",
 		"-show_streams",
-		filePath,
+		"-",
 	)
+	cmd.Stdin = r
 
 	var outputBuf bytes.Buffer
 	cmd.Stdout = &outputBuf
@@ -86,20 +88,20 @@ func GetProbeDataContext(ctx context.Context, filePath string) (data *ProbeData,
 
 // GetProbeDataOptions is used for probing the given media file using ffprobe, optionally taking in extra arguments for ffprobe.
 // It takes a context to allow killing the ffprobe process if it takes too long or in case of shutdown.
-func GetProbeDataOptions(ctx context.Context, file string, extraFFProbeOptions ...string) (data *ProbeData, err error) {
+func GetProbeDataOptions(ctx context.Context, r io.Reader, extraFFProbeOptions ...string) (data *ProbeData, err error) {
 	args := append([]string{
 		"-loglevel", "fatal",
 		"-print_format", "json",
 		"-show_format",
 		"-show_streams",
 	}, extraFFProbeOptions...)
-	args = append(args, file)
 
 	cmd := exec.CommandContext(
 		ctx,
 		binPath,
 		args...,
 	)
+	cmd.Stdin = r
 
 	var outputBuf bytes.Buffer
 	var stdErr bytes.Buffer
