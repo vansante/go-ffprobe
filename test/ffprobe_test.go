@@ -1,7 +1,6 @@
 package ffprobe_test
 
 import (
-	"encoding/json"
 	"testing"
 	"time"
 
@@ -16,53 +15,29 @@ func Test_ffprobe(t *testing.T) {
 		t.Errorf("Error getting data: %v", err)
 	}
 
-	// test data
-	_, err = json.MarshalIndent(data, "", "  ")
-	if err != nil {
-		t.Errorf("Error unmarshalling: %v", err)
-	}
-
-	// test ProbeData.GetFirestVideoStream
-	_, err = json.MarshalIndent(data.GetFirstVideoStream(), "", "  ")
-	if err != nil {
-		t.Errorf("Error unmarshalling: %v", err)
-	}
-
-	// test ProbeData.GetFirstAudioStream
-	_, err = json.MarshalIndent(data.GetFirstAudioStream(), "", "  ")
-	if err != nil {
-		t.Errorf("Error unmarshalling: %v", err)
-	}
-
-	// test ProbeData.GetFirstSubtitleStream
-	_, err = json.MarshalIndent(data.GetFirstSubtitleStream(), "", "  ")
-	if err != nil {
-		t.Errorf("Error unmarshalling: %v", err)
-	}
-
 	// test ProbeData.GetStream
 	stream := data.GetStreams(ffprobe.StreamVideo)
-	if len(stream) == 0 {
-		t.Errorf("don't get stream.")
+	if len(stream) != 1 {
+		t.Errorf("wrong stream length.")
 	}
 
 	stream = data.GetStreams(ffprobe.StreamAudio)
-	if len(stream) == 0 {
-		t.Errorf("don't get stream.")
+	if len(stream) != 1 {
+		t.Errorf("wrong stream length.")
 	}
 
 	// this stream is []
 	data.GetStreams(ffprobe.StreamSubtitle)
 
 	stream = data.GetStreams(ffprobe.StreamAny)
-	if len(stream) == 0 {
-		t.Errorf("don't get stream.")
+	if len(stream) != 2 {
+		t.Errorf("wrong stream length.")
 	}
 
 	// test Format.Duration
 	udration := data.Format.Duration()
-	if udration < time.Duration(60) {
-		t.Errorf("this video is more than 60s.")
+	if udration.Seconds() != 5.312 {
+		t.Errorf("this video is 5.312s.")
 	}
 	// test Format.StartTime
 	startTime := data.Format.StartTime()
