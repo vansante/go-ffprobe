@@ -10,7 +10,6 @@ import (
 func Test_ffprobe(t *testing.T) {
 	// test GetProbeData
 	path := "test.mp4"
-	// data, err := ffprobe.GetProbeData(path, 500*time.Millisecond)
 	data, err := ffprobe.GetProbeData(path, time.Second)
 	if err != nil {
 		t.Errorf("Error getting data: %v", err)
