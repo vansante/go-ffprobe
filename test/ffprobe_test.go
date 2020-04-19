@@ -1,4 +1,4 @@
-package ffprobe_test
+package ffprobe
 
 import (
 	"testing"
@@ -10,7 +10,8 @@ import (
 func Test_ffprobe(t *testing.T) {
 	// test GetProbeData
 	path := "test.mp4"
-	data, err := ffprobe.GetProbeData(path, 500*time.Millisecond)
+	// data, err := ffprobe.GetProbeData(path, 500*time.Millisecond)
+	data, err := ffprobe.GetProbeData(path, time.Second)
 	if err != nil {
 		t.Errorf("Error getting data: %v", err)
 	}
@@ -18,25 +19,28 @@ func Test_ffprobe(t *testing.T) {
 	// test ProbeData.GetStream
 	stream := data.GetStreams(ffprobe.StreamVideo)
 	if len(stream) != 1 {
-		t.Errorf("wrong stream length.")
+		t.Errorf("It just has one video stream.")
 	}
 
 	stream = data.GetStreams(ffprobe.StreamAudio)
 	if len(stream) != 1 {
-		t.Errorf("wrong stream length.")
+		t.Errorf("It just has one audio stream.")
 	}
 
 	// this stream is []
-	data.GetStreams(ffprobe.StreamSubtitle)
+	stream = data.GetStreams(ffprobe.StreamSubtitle)
+	if len(stream) != 0 {
+		t.Errorf("it does not have subtitle stream.")
+	}
 
 	stream = data.GetStreams(ffprobe.StreamAny)
 	if len(stream) != 2 {
-		t.Errorf("wrong stream length.")
+		t.Errorf("It should have two streams.")
 	}
 
 	// test Format.Duration
-	udration := data.Format.Duration()
-	if udration.Seconds() != 5.312 {
+	dration := data.Format.Duration()
+	if dration.Seconds() != 5.312 {
 		t.Errorf("this video is 5.312s.")
 	}
 	// test Format.StartTime
