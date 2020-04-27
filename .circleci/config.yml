@@ -1,11 +1,20 @@
 version: 2.1
 
 executors:
+  golangci-lint:
+    docker:
+      - image: golangci/golangci-lint:v1.25.0
   go:
     docker:
-      - image: circleci/golang:1.13
+      - image: circleci/golang:1.14
 
 jobs:
+  lint:
+    executor: golangci-lint
+    steps:
+      - checkout
+      - run: golangci-lint run
+
   test:
     executor: go
     steps:
@@ -20,4 +29,5 @@ workflows:
   version: 2
   main:
     jobs:
+      - lint
       - test
