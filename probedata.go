@@ -18,18 +18,6 @@ const (
 	StreamSubtitle StreamType = "subtitle"
 )
 
-// TODO: FIXME: We should remove the ALL_CAPS variants some time in the future (golint hates them)
-const (
-	// STREAM_ANY deprecated, use StreamAny
-	STREAM_ANY = StreamAny
-	// STREAM_VIDEO deprecated, use StreamVideo
-	STREAM_VIDEO = StreamVideo
-	// STREAM_AUDIO deprecated, use StreamAudio
-	STREAM_AUDIO = StreamAudio
-	// STREAM_SUBTITLE deprecated, use StreamSubtitle
-	STREAM_SUBTITLE = StreamSubtitle
-)
-
 // ProbeData is the root json data structure returned by an ffprobe.
 type ProbeData struct {
 	Streams []*Stream `json:"streams"`
@@ -135,7 +123,7 @@ func (f *Format) Duration() (duration time.Duration) {
 }
 
 // GetStreams returns all streams which are of the given type
-func (p *ProbeData) GetStreams(streamType StreamType) (streams []Stream) {
+func (p *ProbeData) StreamType(streamType StreamType) (streams []Stream) {
 	for _, s := range p.Streams {
 		if s == nil {
 			continue
@@ -153,7 +141,7 @@ func (p *ProbeData) GetStreams(streamType StreamType) (streams []Stream) {
 }
 
 // GetFirstVideoStream returns the first video stream found
-func (p *ProbeData) GetFirstVideoStream() (str *Stream) {
+func (p *ProbeData) FirstVideoStream() (str *Stream) {
 	for _, s := range p.Streams {
 		if s == nil {
 			continue
@@ -166,7 +154,7 @@ func (p *ProbeData) GetFirstVideoStream() (str *Stream) {
 }
 
 // GetFirstAudioStream returns the first audio stream found
-func (p *ProbeData) GetFirstAudioStream() (str *Stream) {
+func (p *ProbeData) FirstAudioStream() (str *Stream) {
 	for _, s := range p.Streams {
 		if s == nil {
 			continue
@@ -179,7 +167,7 @@ func (p *ProbeData) GetFirstAudioStream() (str *Stream) {
 }
 
 // GetFirstSubtitleStream returns the first subtitle stream found
-func (p *ProbeData) GetFirstSubtitleStream() (str *Stream) {
+func (p *ProbeData) FirstSubtitleStream() (str *Stream) {
 	for _, s := range p.Streams {
 		if s == nil {
 			continue

@@ -6,7 +6,7 @@ import (
 	"os"
 	"time"
 
-	ffprobe "github.com/vansante/go-ffprobe"
+	"gopkg.in/vansante/go-ffprobe.v2"
 )
 
 func main() {
@@ -27,13 +27,13 @@ func main() {
 	}
 	log.Print(string(buf))
 
-	buf, err = json.MarshalIndent(data.GetFirstVideoStream(), "", "  ")
+	buf, err = json.MarshalIndent(data.FirstVideoStream(), "", "  ")
 	if err != nil {
 		log.Panicf("Error unmarshalling: %v", err)
 	}
 	log.Print(string(buf))
 
-	log.Printf("%v", data.GetStreams(ffprobe.StreamVideo))
+	log.Printf("%v", data.StreamType(ffprobe.StreamVideo))
 
 	log.Printf("\nDuration: %v\n", data.Format.Duration())
 	log.Printf("\nStartTime: %v\n", data.Format.StartTime())
