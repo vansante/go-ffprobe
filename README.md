@@ -20,7 +20,7 @@ https://godoc.org/gopkg.in/vansante/go-ffprobe.v2
 To get a quick the quick data on a video file:
 
 ```golang
-ctx, cancelFn := context.WithTimeout(context.Background(), time.Second)
+ctx, cancelFn := context.WithTimeout(context.Background(), 5*time.Second)
 defer cancelFn()
 
 data, err := ffprobe.ProbeURL(ctx, "/path/to/file.mp4")
@@ -35,7 +35,7 @@ command, but with an HTTP URL.
 To get the data of a file you have an `io.Reader` for, use:
 
 ```golang
-ctx, cancelFn := context.WithTimeout(context.Background(), time.Second)
+ctx, cancelFn := context.WithTimeout(context.Background(), 5*time.Second)
 defer cancelFn()
 
 fileReader, err := os.Open("/path/to/file.mp4")

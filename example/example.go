@@ -17,7 +17,7 @@ func main() {
 	}
 	path := os.Args[1]
 
-	ctx, cancelFn := context.WithTimeout(context.Background(), time.Second)
+	ctx, cancelFn := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancelFn()
 
 	data, err := ffprobe.ProbeURL(ctx, path)
