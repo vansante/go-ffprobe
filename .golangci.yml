@@ -48,8 +48,3 @@ linters:
   fast: false
 
 issues:
-  exclude-rules:
-    - path: probedata\.go
-      text: "ALL_CAPS"
-      linters:
-        - golint
