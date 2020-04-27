@@ -1,9 +1,12 @@
 version: 2.1
 
+orbs:
+  golangci-lint: neilisaac/golangci-lint@0.0.1
+
 executors:
   go:
     docker:
-      - image: circleci/golang:1.13
+      - image: circleci/golang:1.14
 
 jobs:
   test:
