@@ -33,11 +33,7 @@ func ProbeURL(ctx context.Context, fileURL string, extraFFProbeOptions ...string
 	// Add the file argument
 	args = append(args, fileURL)
 
-	cmd := exec.CommandContext(
-		ctx,
-		binPath,
-		args...,
-	)
+	cmd := exec.CommandContext(ctx, binPath, args...)
 
 	return runProbe(cmd)
 }
