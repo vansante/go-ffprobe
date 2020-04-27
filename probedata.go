@@ -141,7 +141,7 @@ func (p *ProbeData) StreamType(streamType StreamType) (streams []Stream) {
 }
 
 // GetFirstVideoStream returns the first video stream found
-func (p *ProbeData) FirstVideoStream() (str *Stream) {
+func (p *ProbeData) FirstVideoStream() *Stream {
 	for _, s := range p.Streams {
 		if s == nil {
 			continue
@@ -154,7 +154,7 @@ func (p *ProbeData) FirstVideoStream() (str *Stream) {
 }
 
 // GetFirstAudioStream returns the first audio stream found
-func (p *ProbeData) FirstAudioStream() (str *Stream) {
+func (p *ProbeData) FirstAudioStream() *Stream {
 	for _, s := range p.Streams {
 		if s == nil {
 			continue
@@ -167,7 +167,7 @@ func (p *ProbeData) FirstAudioStream() (str *Stream) {
 }
 
 // GetFirstSubtitleStream returns the first subtitle stream found
-func (p *ProbeData) FirstSubtitleStream() (str *Stream) {
+func (p *ProbeData) FirstSubtitleStream() *Stream {
 	for _, s := range p.Streams {
 		if s == nil {
 			continue

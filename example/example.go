@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"log"
 	"os"
@@ -16,7 +17,10 @@ func main() {
 	}
 	path := os.Args[1]
 
-	data, err := ffprobe.GetProbeData(path, 500*time.Millisecond)
+	ctx, cancelFn := context.WithTimeout(context.Background(), time.Second)
+	defer cancelFn()
+
+	data, err := ffprobe.ProbeURL(ctx, path)
 	if err != nil {
 		log.Panicf("Error getting data: %v", err)
 	}
