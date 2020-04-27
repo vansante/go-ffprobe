@@ -43,7 +43,7 @@ if err != nil {
     t.Errorf("Error opening test file: %v", err)
 }
 
-data, err := ProbeReader(ctx, fileReader)
+data, err := ffprobe.ProbeReader(ctx, fileReader)
 if err != nil {
     log.Panicf("Error getting data: %v", err)
 }
