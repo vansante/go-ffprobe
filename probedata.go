@@ -122,7 +122,7 @@ func (f *Format) Duration() (duration time.Duration) {
 	return time.Duration(f.DurationSeconds * float64(time.Second))
 }
 
-// GetStreams returns all streams which are of the given type
+// StreamType returns all streams which are of the given type
 func (p *ProbeData) StreamType(streamType StreamType) (streams []Stream) {
 	for _, s := range p.Streams {
 		if s == nil {
@@ -140,7 +140,7 @@ func (p *ProbeData) StreamType(streamType StreamType) (streams []Stream) {
 	return streams
 }
 
-// GetFirstVideoStream returns the first video stream found
+// FirstVideoStream returns the first video stream found
 func (p *ProbeData) FirstVideoStream() *Stream {
 	for _, s := range p.Streams {
 		if s == nil {
@@ -153,7 +153,7 @@ func (p *ProbeData) FirstVideoStream() *Stream {
 	return nil
 }
 
-// GetFirstAudioStream returns the first audio stream found
+// FirstAudioStream returns the first audio stream found
 func (p *ProbeData) FirstAudioStream() *Stream {
 	for _, s := range p.Streams {
 		if s == nil {
@@ -166,7 +166,7 @@ func (p *ProbeData) FirstAudioStream() *Stream {
 	return nil
 }
 
-// GetFirstSubtitleStream returns the first subtitle stream found
+// FirstSubtitleStream returns the first subtitle stream found
 func (p *ProbeData) FirstSubtitleStream() *Stream {
 	for _, s := range p.Streams {
 		if s == nil {
