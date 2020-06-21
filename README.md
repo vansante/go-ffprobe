@@ -29,7 +29,7 @@ if err != nil {
 }
 ```
 
-To get a quick the quick data on a video file that is accessible via HTTP, you can use the same
+To get the ffprobe data for a video file that is accessible via HTTP, you can use the same
 command, but with an HTTP URL.
 
 To get the data of a file you have an `io.Reader` for, use:
@@ -40,7 +40,7 @@ defer cancelFn()
 
 fileReader, err := os.Open("/path/to/file.mp4")
 if err != nil {
-    t.Errorf("Error opening test file: %v", err)
+    log.Panicf("Error opening test file: %v", err)
 }
 
 data, err := ffprobe.ProbeReader(ctx, fileReader)
