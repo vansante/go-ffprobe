@@ -34,6 +34,7 @@ func ProbeURL(ctx context.Context, fileURL string, extraFFProbeOptions ...string
 	args = append(args, fileURL)
 
 	cmd := exec.CommandContext(ctx, binPath, args...)
+	cmd.SysProcAttr = procAttributes()
 
 	return runProbe(cmd)
 }
@@ -55,6 +56,7 @@ func ProbeReader(ctx context.Context, reader io.Reader, extraFFProbeOptions ...s
 
 	cmd := exec.CommandContext(ctx, binPath, args...)
 	cmd.Stdin = reader
+	cmd.SysProcAttr = procAttributes()
 
 	return runProbe(cmd)
 }
