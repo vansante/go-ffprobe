@@ -16,6 +16,10 @@ const (
 	StreamAudio StreamType = "audio"
 	// StreamSubtitle is a subtitle stream
 	StreamSubtitle StreamType = "subtitle"
+	// StreamAttachment is an attachment stream
+	StreamAttachment StreamType = "attachment"
+	// StreamData is a data stream
+	StreamData StreamType = "data"
 )
 
 // ProbeData is the root json data structure returned by an ffprobe.
