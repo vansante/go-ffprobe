@@ -16,10 +16,10 @@ const (
 	StreamAudio StreamType = "audio"
 	// StreamSubtitle is a subtitle stream
 	StreamSubtitle StreamType = "subtitle"
-	// StreamAttachment is an attachment stream
-	StreamAttachment StreamType = "attachment"
 	// StreamData is a data stream
 	StreamData StreamType = "data"
+	// StreamAttachment is an attachment stream
+	StreamAttachment StreamType = "attachment"
 )
 
 // ProbeData is the root json data structure returned by an ffprobe.
@@ -146,37 +146,35 @@ func (p *ProbeData) StreamType(streamType StreamType) (streams []Stream) {
 
 // FirstVideoStream returns the first video stream found
 func (p *ProbeData) FirstVideoStream() *Stream {
-	for _, s := range p.Streams {
-		if s == nil {
-			continue
-		}
-		if s.CodecType == string(StreamVideo) {
-			return s
-		}
-	}
-	return nil
+	return p.firstStream(StreamVideo)
 }
 
 // FirstAudioStream returns the first audio stream found
 func (p *ProbeData) FirstAudioStream() *Stream {
-	for _, s := range p.Streams {
-		if s == nil {
-			continue
-		}
-		if s.CodecType == string(StreamAudio) {
-			return s
-		}
-	}
-	return nil
+	return p.firstStream(StreamAudio)
 }
 
 // FirstSubtitleStream returns the first subtitle stream found
 func (p *ProbeData) FirstSubtitleStream() *Stream {
+	return p.firstStream(StreamSubtitle)
+}
+
+// FirstDataStream returns the first data stream found
+func (p *ProbeData) FirstDataStream() *Stream {
+	return p.firstStream(StreamData)
+}
+
+// FirstAttachmentStream returns the first attachment stream found
+func (p *ProbeData) FirstAttachmentStream() *Stream {
+	return p.firstStream(StreamAttachment)
+}
+
+func (p *ProbeData) firstStream(streamType StreamType) *Stream {
 	for _, s := range p.Streams {
 		if s == nil {
 			continue
 		}
-		if s.CodecType == string(StreamSubtitle) {
+		if s.CodecType == string(streamType) {
 			return s
 		}
 	}

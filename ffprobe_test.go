@@ -84,14 +84,14 @@ func validateData(t *testing.T, data *ProbeData) {
 		t.Errorf("It does not have a subtitle stream.")
 	}
 
-	stream = data.StreamType(StreamAttachment)
-	if len(stream) != 0 {
-		t.Errorf("It does not have an attachment stream.")
-	}
-
 	stream = data.StreamType(StreamData)
 	if len(stream) != 0 {
 		t.Errorf("It does not have a data stream.")
+	}
+
+	stream = data.StreamType(StreamAttachment)
+	if len(stream) != 0 {
+		t.Errorf("It does not have an attachment stream.")
 	}
 
 	stream = data.StreamType(StreamAny)
