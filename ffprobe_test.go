@@ -84,14 +84,24 @@ func validateData(t *testing.T, data *ProbeData) {
 		t.Errorf("It does not have a subtitle stream.")
 	}
 
+	stream = data.StreamType(StreamData)
+	if len(stream) != 0 {
+		t.Errorf("It does not have a data stream.")
+	}
+
+	stream = data.StreamType(StreamAttachment)
+	if len(stream) != 0 {
+		t.Errorf("It does not have an attachment stream.")
+	}
+
 	stream = data.StreamType(StreamAny)
 	if len(stream) != 2 {
 		t.Errorf("It should have two streams.")
 	}
 
 	// test Format.Duration
-	dration := data.Format.Duration()
-	if dration.Seconds() != 5.312 {
+	duration := data.Format.Duration()
+	if duration.Seconds() != 5.312 {
 		t.Errorf("this video is 5.312s.")
 	}
 	// test Format.StartTime
