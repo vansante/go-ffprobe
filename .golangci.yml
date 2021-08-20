@@ -27,19 +27,21 @@ linters-settings:
 
 linters:
   enable:
+    - exportloopref
     - megacheck
     - govet
-    - golint
     - gosec
     - unconvert
     - goconst
     - gocyclo
     - gofmt
-    - maligned
     - lll
+    - revive
     - unparam
     - nakedret
     - misspell
+  disable:
+    - exhaustive
   enable-all: false
   disable-all: false
   presets:
