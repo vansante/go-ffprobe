@@ -57,6 +57,9 @@ type FormatTags struct {
 	MinorVersion     string `json:"minor_version"`
 	CompatibleBrands string `json:"compatible_brands"`
 	CreationTime     string `json:"creation_time"`
+	Comment          string `json:"comment"`
+	VCodec           string `json:"vcodec"`
+	Encoder          string `json:"encoder"`
 }
 
 // Stream is a json data structure to represent streams.
