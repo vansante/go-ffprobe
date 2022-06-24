@@ -95,7 +95,7 @@ func valToFloat64(str string) (float64, error) {
 }
 
 // FormatTags is a json data structure to represent format tags
-// Deprecated, use the Tags of TagsRaw instead
+// Deprecated, use the Tags of TagList instead
 type FormatTags struct {
 	MajorBrand       string `json:"major_brand"`
 	MinorVersion     string `json:"minor_version"`
@@ -111,7 +111,7 @@ func (f *FormatTags) setFrom(tags Tags) {
 }
 
 // StreamTags is a json data structure to represent stream tags
-// Deprecated, use the Tags of TagsRaw instead
+// Deprecated, use the Tags of TagList instead
 type StreamTags struct {
 	Rotate       int    `json:"rotate,string,omitempty"`
 	CreationTime string `json:"creation_time,omitempty"`

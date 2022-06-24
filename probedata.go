@@ -40,8 +40,8 @@ type Format struct {
 	Size             string      `json:"size"`
 	BitRate          string      `json:"bit_rate"`
 	ProbeScore       int         `json:"probe_score"`
-	TagsRaw          Tags        `json:"tags"`
-	Tags             *FormatTags `json:"-"` // Deprecated: Use TagsRaw instead
+	TagList          Tags        `json:"tags"`
+	Tags             *FormatTags `json:"-"` // Deprecated: Use TagList instead
 }
 
 // Stream is a json data structure to represent streams.
@@ -66,8 +66,8 @@ type Stream struct {
 	BitsPerRawSample   string            `json:"bits_per_raw_sample"`
 	NbFrames           string            `json:"nb_frames"`
 	Disposition        StreamDisposition `json:"disposition,omitempty"`
-	TagsRaw            Tags              `json:"tags"`
-	Tags               StreamTags        `json:"-"` // Deprecated: Use TagsRaw instead
+	TagList            Tags              `json:"tags"`
+	Tags               StreamTags        `json:"-"` // Deprecated: Use TagList instead
 	Profile            string            `json:"profile,omitempty"`
 	Width              int               `json:"width"`
 	Height             int               `json:"height"`

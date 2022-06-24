@@ -82,7 +82,7 @@ func validateData(t *testing.T, data *ProbeData) {
 		t.Errorf("Video stream language tag is not %s", testLanguage)
 	}
 
-	if val, err := stream[0].TagsRaw.GetString("language"); err != nil {
+	if val, err := stream[0].TagList.GetString("language"); err != nil {
 		t.Errorf("retrieving language tag errors: %v", err)
 	} else if val != testLanguage {
 		t.Errorf("Video stream language tag is not %s", testLanguage)
@@ -120,7 +120,7 @@ func validateData(t *testing.T, data *ProbeData) {
 		t.Errorf("MajorBrand format tag is not %s", testMajorBrand)
 	}
 
-	if val, err := data.Format.TagsRaw.GetString("major_brand"); err != nil {
+	if val, err := data.Format.TagList.GetString("major_brand"); err != nil {
 		t.Errorf("retrieving major_brand tag errors: %v", err)
 	} else if val != testMajorBrand {
 		t.Errorf("MajorBrand format tag is not %s", testMajorBrand)

@@ -83,12 +83,12 @@ func runProbe(cmd *exec.Cmd) (data *ProbeData, err error) {
 	}
 
 	// Populate the old Tags structs for backwards compatibility purposes:
-	if len(data.Format.TagsRaw) > 0 {
+	if len(data.Format.TagList) > 0 {
 		data.Format.Tags = &FormatTags{}
-		data.Format.Tags.setFrom(data.Format.TagsRaw)
+		data.Format.Tags.setFrom(data.Format.TagList)
 	}
 	for _, str := range data.Streams {
-		str.Tags.setFrom(str.TagsRaw)
+		str.Tags.setFrom(str.TagList)
 	}
 
 	return data, nil
