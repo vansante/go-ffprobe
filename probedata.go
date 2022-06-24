@@ -40,15 +40,8 @@ type Format struct {
 	Size             string      `json:"size"`
 	BitRate          string      `json:"bit_rate"`
 	ProbeScore       int         `json:"probe_score"`
-	Tags             *FormatTags `json:"tags"`
-}
-
-// FormatTags is a json data structure to represent format tags
-type FormatTags struct {
-	MajorBrand       string `json:"major_brand"`
-	MinorVersion     string `json:"minor_version"`
-	CompatibleBrands string `json:"compatible_brands"`
-	CreationTime     string `json:"creation_time"`
+	TagList          Tags        `json:"tags"`
+	Tags             *FormatTags `json:"-"` // Deprecated: Use TagList instead
 }
 
 // Stream is a json data structure to represent streams.
@@ -73,7 +66,8 @@ type Stream struct {
 	BitsPerRawSample   string            `json:"bits_per_raw_sample"`
 	NbFrames           string            `json:"nb_frames"`
 	Disposition        StreamDisposition `json:"disposition,omitempty"`
-	Tags               StreamTags        `json:"tags,omitempty"`
+	TagList            Tags              `json:"tags"`
+	Tags               StreamTags        `json:"-"` // Deprecated: Use TagList instead
 	Profile            string            `json:"profile,omitempty"`
 	Width              int               `json:"width"`
 	Height             int               `json:"height"`
@@ -104,16 +98,6 @@ type StreamDisposition struct {
 	VisualImpaired  int `json:"visual_impaired"`
 	CleanEffects    int `json:"clean_effects"`
 	AttachedPic     int `json:"attached_pic"`
-}
-
-// StreamTags is a json data structure to represent stream tags
-type StreamTags struct {
-	Rotate       int    `json:"rotate,string,omitempty"`
-	CreationTime string `json:"creation_time,omitempty"`
-	Language     string `json:"language,omitempty"`
-	Title        string `json:"title,omitempty"`
-	Encoder      string `json:"encoder,omitempty"`
-	Location     string `json:"location,omitempty"`
 }
 
 // StartTime returns the start time of the media file as a time.Duration
