@@ -73,6 +73,20 @@ func validateData(t *testing.T, data *ProbeData) {
 		t.Errorf("It just has one video stream.")
 	}
 
+	// Check some Tags
+	if stream[0].Tags.Rotate != 0 {
+		t.Errorf("Video stream rotate tag is not 0")
+	}
+	if stream[0].Tags.Language != "und" {
+		t.Errorf("Video stream language tag is not und")
+	}
+
+	if val, err := stream[0].TagsRaw.GetString("language"); err != nil {
+		t.Errorf("retrieving language tag errors: %v", err)
+	} else if val != "und" {
+		t.Errorf("Video stream language tag is not und")
+	}
+
 	stream = data.StreamType(StreamAudio)
 	if len(stream) != 1 {
 		t.Errorf("It just has one audio stream.")
@@ -97,6 +111,17 @@ func validateData(t *testing.T, data *ProbeData) {
 	stream = data.StreamType(StreamAny)
 	if len(stream) != 2 {
 		t.Errorf("It should have two streams.")
+	}
+
+	// Check some Tags
+	if data.Format.Tags.MajorBrand != "isom" {
+		t.Errorf("MajorBrand format tag is not isom")
+	}
+
+	if val, err := data.Format.TagsRaw.GetString("major_brand"); err != nil {
+		t.Errorf("retrieving major_brand tag errors: %v", err)
+	} else if val != "isom" {
+		t.Errorf("MajorBrand format tag is not isom")
 	}
 
 	// test Format.Duration
