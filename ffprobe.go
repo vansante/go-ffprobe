@@ -9,9 +9,7 @@ import (
 	"os/exec"
 )
 
-var (
-	binPath = "ffprobe"
-)
+var binPath = "ffprobe"
 
 // SetFFProbeBinPath sets the global path to find and execute the ffprobe program
 func SetFFProbeBinPath(newBinPath string) {
@@ -82,6 +80,12 @@ func runProbe(cmd *exec.Cmd) (data *ProbeData, err error) {
 	err = json.Unmarshal(outputBuf.Bytes(), data)
 	if err != nil {
 		return data, fmt.Errorf("error parsing ffprobe output: %w", err)
+	}
+
+	// Populate the old Tags structs for backwards compatibility purposes:
+	data.Format.Tags.setFrom(data.Format.TagsRaw)
+	for _, str := range data.Streams {
+		str.Tags.setFrom(str.TagsRaw)
 	}
 
 	return data, nil
