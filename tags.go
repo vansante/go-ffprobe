@@ -87,7 +87,7 @@ func (t Tags) GetFloat(tag string) (float64, error) {
 }
 
 func valToFloat64(str string) (float64, error) {
-	val, err := strconv.ParseFloat(str, -1)
+	val, err := strconv.ParseFloat(str, 64)
 	if err != nil {
 		return 0, fmt.Errorf("float64 parsing error (%v): %w", str, err)
 	}
