@@ -68,6 +68,7 @@ type Stream struct {
 	Disposition        StreamDisposition `json:"disposition,omitempty"`
 	TagList            Tags              `json:"tags"`
 	Tags               StreamTags        `json:"-"` // Deprecated: Use TagList instead
+	FieldOrder         string            `json:"field_order,omitempty"`
 	Profile            string            `json:"profile,omitempty"`
 	Width              int               `json:"width"`
 	Height             int               `json:"height"`
