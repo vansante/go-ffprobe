@@ -82,6 +82,10 @@ func runProbe(cmd *exec.Cmd) (data *ProbeData, err error) {
 		return data, fmt.Errorf("error parsing ffprobe output: %w", err)
 	}
 
+	if data.Format == nil {
+		return data, fmt.Errorf("no format data found in ffprobe output")
+	}
+
 	// Populate the old Tags structs for backwards compatibility purposes:
 	if len(data.Format.TagList) > 0 {
 		data.Format.Tags = &FormatTags{}
