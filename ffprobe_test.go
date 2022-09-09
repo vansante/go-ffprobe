@@ -34,7 +34,7 @@ func Test_ProbeURL_HTTP(t *testing.T) {
 	// Serve all files in assets
 	go func() {
 		http.Handle("/", http.FileServer(http.Dir("./assets")))
-		err := http.ListenAndServe(fmt.Sprintf(":%d", testPort), nil)
+		err := http.ListenAndServe(fmt.Sprintf(":%d", testPort), nil) //nolint:gosec
 		t.Log(err)
 	}()
 
