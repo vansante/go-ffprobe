@@ -84,6 +84,7 @@ type Stream struct {
 	Channels           int               `json:"channels,omitempty"`
 	ChannelLayout      string            `json:"channel_layout,omitempty"`
 	BitsPerSample      int               `json:"bits_per_sample,omitempty"`
+	SideDataList       []SideData        `json:"side_data_list,omitempty"`
 }
 
 // StreamDisposition is a json data structure to represent stream dispositions
@@ -100,6 +101,9 @@ type StreamDisposition struct {
 	CleanEffects    int `json:"clean_effects"`
 	AttachedPic     int `json:"attached_pic"`
 }
+
+// SideData is a json data structure to represent stream side data
+type SideData map[string]interface{}
 
 // StartTime returns the start time of the media file as a time.Duration
 func (f *Format) StartTime() (duration time.Duration) {
