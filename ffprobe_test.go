@@ -157,15 +157,16 @@ func Test_ProbeSideData(t *testing.T) {
 		t.Error("Video Stream was nil")
 	}
 
-	if len(videoStream.SideDataList) < 1 {
-		t.Error("Side data list was empty")
+	sideData, err := videoStream.SideDataList.GetSideData("Display Matrix")
+	if err != nil {
+		t.Errorf("Error getting side data: %v", err)
 	}
 
-	rotation, err := videoStream.SideDataList[0].GetString("rotation")
+	rotation, err := sideData.GetInt("rotation")
 	if err != nil {
 		t.Errorf("Error getting rotation field: %v", err)
 	}
-	if rotation != "-180" {
-		t.Errorf("Expected rotation to be \"-180\", got \"%s\"", rotation)
+	if rotation != -180 {
+		t.Errorf("Expected rotation to be -180, got %d", rotation)
 	}
 }
