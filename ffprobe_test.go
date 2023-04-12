@@ -155,6 +155,7 @@ func Test_ProbeSideData(t *testing.T) {
 	videoStream := data.FirstVideoStream()
 	if videoStream == nil {
 		t.Error("Video Stream was nil")
+		return
 	}
 
 	sideData, err := videoStream.SideDataList.GetSideData("Display Matrix")
