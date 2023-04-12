@@ -137,3 +137,37 @@ func validateData(t *testing.T, data *ProbeData) {
 		t.Errorf("this video starts at 0s.")
 	}
 }
+
+func Test_ProbeSideData(t *testing.T) {
+	ctx, cancelFn := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancelFn()
+
+	fileReader, err := os.Open("assets/test.mov")
+	if err != nil {
+		t.Errorf("Error opening test file: %v", err)
+	}
+
+	data, err := ProbeReader(ctx, fileReader)
+	if err != nil {
+		t.Errorf("Error getting data: %v", err)
+	}
+
+	videoStream := data.FirstVideoStream()
+	if videoStream == nil {
+		t.Error("Video Stream was nil")
+		return
+	}
+
+	sideData, err := videoStream.SideDataList.GetSideData("Display Matrix")
+	if err != nil {
+		t.Errorf("Error getting side data: %v", err)
+	}
+
+	rotation, err := sideData.GetInt("rotation")
+	if err != nil {
+		t.Errorf("Error getting rotation field: %v", err)
+	}
+	if rotation != -180 {
+		t.Errorf("Expected rotation to be -180, got %d", rotation)
+	}
+}
