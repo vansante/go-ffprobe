@@ -24,8 +24,20 @@ const (
 
 // ProbeData is the root json data structure returned by an ffprobe.
 type ProbeData struct {
-	Streams []*Stream `json:"streams"`
-	Format  *Format   `json:"format"`
+	Streams  []*Stream   `json:"streams"`
+	Format   *Format     `json:"format"`
+	Chapters []*Chapters `json:"chapters"`
+}
+
+// Chapters is a json data structure to represent chapters.
+type Chapters struct {
+	ID        int    `json:"id"`
+	TimeBase  string `json:"time_base"`
+	Start     uint64 `json:"start"`
+	StartTime string `json:"start_time"`
+	End       uint64 `json:"end"`
+	EndTime   string `json:"end_time"`
+	TagList   Tags   `json:"tags"`
 }
 
 // Format is a json data structure to represent formats
