@@ -72,9 +72,9 @@ func runProbe(cmd *exec.Cmd) (data *ProbeData, err error) {
 		return nil, fmt.Errorf("error running %s [%s] %w", binPath, stdErr.String(), err)
 	}
 
-	if stdErr.Len() > 0 {
-		return nil, fmt.Errorf("ffprobe error: %s", stdErr.String())
-	}
+	//if stdErr.Len() > 0 {
+	//	return nil, fmt.Errorf("ffprobe error: %s", stdErr.String())
+	//}
 
 	data = &ProbeData{}
 	err = json.Unmarshal(outputBuf.Bytes(), data)
