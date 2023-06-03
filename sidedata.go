@@ -23,20 +23,27 @@ const (
 	SideDataTypeContentLightLevel        = "Content light level metadata"
 )
 
+type SideDataBase struct {
+	Type string `json:"side_data_type"`
+}
+
 // SideDataDisplayMatrix represents the display matrix side data.
 type SideDataDisplayMatrix struct {
+	SideDataBase
 	Data     string `json:"displaymatrix"`
 	Rotation int    `json:"rotation"`
 }
 
 // SideDataStereo3D represents the stereo 3D side data.
 type SideDataStereo3D struct {
+	SideDataBase
 	Type     string `json:"type"`
 	Inverted bool   `json:"inverted"`
 }
 
 // SideDataSphericalMapping represents the spherical mapping side data.
 type SideDataSphericalMapping struct {
+	SideDataBase
 	Projection  string `json:"projection"`
 	Padding     int    `json:"padding,omitempty"`
 	BoundLeft   int    `json:"bound_left,omitempty"`
@@ -50,6 +57,7 @@ type SideDataSphericalMapping struct {
 
 // SideDataSkipSamples represents the skip samples side data.
 type SideDataSkipSamples struct {
+	SideDataBase
 	SkipSamples    int `json:"skip_samples"`
 	DiscardPadding int `json:"discard_padding"`
 	SkipReason     int `json:"skip_reason"`
@@ -58,6 +66,7 @@ type SideDataSkipSamples struct {
 
 // SideDataMasteringDisplayMetadata represents the mastering display metadata side data.
 type SideDataMasteringDisplayMetadata struct {
+	SideDataBase
 	RedX         int `json:"red_x,omitempty"`
 	RedY         int `json:"red_y,omitempty"`
 	GreenX       int `json:"green_x,omitempty"`
@@ -72,6 +81,7 @@ type SideDataMasteringDisplayMetadata struct {
 
 // SideDataContentLightLevel represents the content light level side data.
 type SideDataContentLightLevel struct {
+	SideDataBase
 	MaxContent int `json:"max_content,omitempty"`
 	MaxAverage int `json:"max_average,omitempty"`
 }
@@ -81,40 +91,44 @@ type SideDataUnknown Tags
 
 // SideData represents a side data packet.
 type SideData struct {
-	SideDataType string `json:"side_data_type"`
-	Data         interface{}
+	SideDataBase
+	Data interface{} `json:"-"`
 }
 
-// Custom UnmarshalJSON to decode into specific structure based on SideDataType
 func (sd *SideData) UnmarshalJSON(b []byte) error {
-	var raw = &struct {
-		SideDataType string `json:"side_data_type"`
-	}{}
+	type Alias SideData
+	aux := &struct {
+		*Alias
+	}{
+		Alias: (*Alias)(sd),
+	}
 
-	if err := json.Unmarshal(b, raw); err != nil {
+	if err := json.Unmarshal(b, aux); err != nil {
 		return err
 	}
 
-	sd.SideDataType = raw.SideDataType
-
-	switch sd.SideDataType {
+	switch sd.Type {
 	case SideDataTypeDisplayMatrix:
 		sd.Data = &SideDataDisplayMatrix{}
 	case SideDataTypeStereo3D:
-		sd.Data = &SideDataStereo3D{}
+		sd.Data = new(SideDataStereo3D)
 	case SideDataTypeSphericalMapping:
-		sd.Data = &SideDataSphericalMapping{}
+		sd.Data = new(SideDataSphericalMapping)
 	case SideDataTypeSkipSamples:
-		sd.Data = &SideDataSkipSamples{}
+		sd.Data = new(SideDataSkipSamples)
 	case SideDataTypeMasteringDisplayMetadata:
-		sd.Data = &SideDataMasteringDisplayMetadata{}
+		sd.Data = new(SideDataMasteringDisplayMetadata)
 	case SideDataTypeContentLightLevel:
-		sd.Data = &SideDataContentLightLevel{}
+		sd.Data = new(SideDataContentLightLevel)
 	default:
-		sd.Data = &SideDataUnknown{}
+		sd.Data = new(SideDataUnknown)
 	}
 
 	return json.Unmarshal(b, sd.Data)
+}
+
+func (sd *SideData) MarshalJSON() ([]byte, error) {
+	return json.Marshal(sd.Data)
 }
 
 // SideDataList represents a list of side data packets.
@@ -234,7 +248,7 @@ func (s SideDataList) GetContentLightLevel() (*SideDataContentLightLevel, error)
 
 func (s SideDataList) findSideDataByName(sideDataType string) (interface{}, bool) {
 	for _, sd := range s {
-		if sd.SideDataType == sideDataType {
+		if sd.Type == sideDataType {
 			return sd.Data, true
 		}
 	}
