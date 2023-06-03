@@ -77,7 +77,7 @@ type SideDataContentLightLevel struct {
 }
 
 // SideDataUnknown represents an unknown side data.
-type SideDataUnknown []Tags
+type SideDataUnknown Tags
 
 // SideData represents a side data packet.
 type SideData struct {
