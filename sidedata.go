@@ -152,13 +152,33 @@ func (s *SideDataList) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
-// FindSideData searches for SideData by its type. If such SideData is found, it is returned,
-// otherwise, an error is returned indicating that the SideData was not found.
+// FindUnknownSideData searches for SideData of type SideDataUnknown in the SideDataList.
+// If such SideData is found, it is returned, otherwise, an error is returned
+// indicating that the SideData of type SideDataUnknown was not found or the found
+// SideData was of an unexpected type.
+func (s SideDataList) FindUnknownSideData(sideDataType string) (*SideDataUnknown, error) {
+	data, found := s.findSideDataByName(sideDataType)
+	if !found {
+		return nil, ErrSideDataNotFound
+	}
+
+	unknownSideData, ok := data.(*SideDataUnknown)
+	if !ok {
+		return nil, ErrSideDataUnexpectedType
+	}
+
+	return unknownSideData, nil
+}
+
+// FindSideData searches for SideData by its type in the SideDataList.
+// If SideData of the specified type is found, it is returned, otherwise,
+// an error is returned indicating that the SideData of the specified type was not found.
 func (s SideDataList) FindSideData(sideDataType string) (interface{}, error) {
 	data, found := s.findSideDataByName(sideDataType)
 	if !found {
 		return nil, ErrSideDataNotFound
 	}
+
 	return data, nil
 }
 
