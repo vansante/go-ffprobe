@@ -158,16 +158,12 @@ func Test_ProbeSideData(t *testing.T) {
 		return
 	}
 
-	sideData, err := videoStream.SideDataList.GetSideData("Display Matrix")
+	sideData, err := videoStream.SideDataList.GetDisplayMatrix()
 	if err != nil {
-		t.Errorf("Error getting side data: %v", err)
+		t.Errorf("Error getting display matrix: %v", err)
 	}
 
-	rotation, err := sideData.GetInt("rotation")
-	if err != nil {
-		t.Errorf("Error getting rotation field: %v", err)
-	}
-	if rotation != -180 {
-		t.Errorf("Expected rotation to be -180, got %d", rotation)
+	if sideData.Rotation != -180 {
+		t.Errorf("Expected rotation to be -180, got %d", sideData.Rotation)
 	}
 }
