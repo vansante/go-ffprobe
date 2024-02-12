@@ -10,7 +10,8 @@ import (
 )
 
 const (
-	testPath = "assets/test.mp4"
+	testPath      = "assets/test.mp4"
+	testPathError = "assets/test.avi"
 )
 
 func Test_ProbeURL(t *testing.T) {
@@ -23,6 +24,16 @@ func Test_ProbeURL(t *testing.T) {
 	}
 
 	validateData(t, data)
+}
+
+func Test_ProbeURL_Error(t *testing.T) {
+	ctx, cancelFn := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancelFn()
+
+	_, err := ProbeURL(ctx, testPathError)
+	if err == nil {
+		t.Errorf("No error reading bad asset")
+	}
 }
 
 func Test_ProbeURL_HTTP(t *testing.T) {
@@ -47,6 +58,11 @@ func Test_ProbeURL_HTTP(t *testing.T) {
 	}
 
 	validateData(t, data)
+
+	_, err = ProbeURL(ctx, fmt.Sprintf("http://127.0.0.1:%d/test.avi", testPort))
+	if err == nil {
+		t.Errorf("No error reading bad asset")
+	}
 }
 
 func Test_ProbeReader(t *testing.T) {
@@ -64,6 +80,21 @@ func Test_ProbeReader(t *testing.T) {
 	}
 
 	validateData(t, data)
+}
+
+func Test_ProbeReader_Error(t *testing.T) {
+	ctx, cancelFn := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancelFn()
+
+	fileReader, err := os.Open(testPathError)
+	if err != nil {
+		t.Errorf("Error opening test file: %v", err)
+	}
+
+	_, err = ProbeReader(ctx, fileReader)
+	if err == nil {
+		t.Errorf("No error reading bad asset")
+	}
 }
 
 func validateData(t *testing.T, data *ProbeData) {
