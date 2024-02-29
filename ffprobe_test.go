@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"strings"
 	"testing"
 	"time"
 )
@@ -30,9 +31,13 @@ func Test_ProbeURL_Error(t *testing.T) {
 	ctx, cancelFn := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancelFn()
 
-	_, err := ProbeURL(ctx, testPathError)
+	_, err := ProbeURL(ctx, testPathError, "-loglevel", "error")
 	if err == nil {
 		t.Errorf("No error reading bad asset")
+	}
+
+	if strings.Contains(err.Error(), "[]") {
+		t.Errorf("No stderr included in error message")
 	}
 }
 
@@ -59,9 +64,13 @@ func Test_ProbeURL_HTTP(t *testing.T) {
 
 	validateData(t, data)
 
-	_, err = ProbeURL(ctx, fmt.Sprintf("http://127.0.0.1:%d/test.avi", testPort))
+	_, err = ProbeURL(ctx, fmt.Sprintf("http://127.0.0.1:%d/test.avi", testPort), "-loglevel", "error")
 	if err == nil {
 		t.Errorf("No error reading bad asset")
+	}
+
+	if strings.Contains(err.Error(), "[]") {
+		t.Errorf("No stderr included in error message")
 	}
 }
 
@@ -91,9 +100,13 @@ func Test_ProbeReader_Error(t *testing.T) {
 		t.Errorf("Error opening test file: %v", err)
 	}
 
-	_, err = ProbeReader(ctx, fileReader)
+	_, err = ProbeReader(ctx, fileReader, "-loglevel", "error")
 	if err == nil {
 		t.Errorf("No error reading bad asset")
+	}
+
+	if strings.Contains(err.Error(), "[]") {
+		t.Errorf("No stderr included in error message")
 	}
 }
 

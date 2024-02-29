@@ -22,7 +22,7 @@ func SetFFProbeBinPath(newBinPath string) {
 // Any additional ffprobe parameter can be supplied as well using extraFFProbeOptions.
 func ProbeURL(ctx context.Context, fileURL string, extraFFProbeOptions ...string) (data *ProbeData, err error) {
 	args := append([]string{
-		"-loglevel", "error",
+		"-loglevel", "fatal",
 		"-print_format", "json",
 		"-show_format",
 		"-show_streams",
@@ -43,7 +43,7 @@ func ProbeURL(ctx context.Context, fileURL string, extraFFProbeOptions ...string
 // Any additional ffprobe parameter can be supplied as well using extraFFProbeOptions.
 func ProbeReader(ctx context.Context, reader io.Reader, extraFFProbeOptions ...string) (data *ProbeData, err error) {
 	args := append([]string{
-		"-loglevel", "error",
+		"-loglevel", "fatal",
 		"-print_format", "json",
 		"-show_format",
 		"-show_streams",
