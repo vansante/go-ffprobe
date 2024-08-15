@@ -80,6 +80,7 @@ type Stream struct {
 	Level              int               `json:"level,omitempty"`
 	ColorRange         string            `json:"color_range,omitempty"`
 	ColorSpace         string            `json:"color_space,omitempty"`
+	ColorTransfer      string            `json:"color_transfer,omitempty"`
 	SampleFmt          string            `json:"sample_fmt,omitempty"`
 	SampleRate         string            `json:"sample_rate,omitempty"`
 	Channels           int               `json:"channels,omitempty"`
