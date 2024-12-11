@@ -80,6 +80,8 @@ type Stream struct {
 	Level              int               `json:"level,omitempty"`
 	ColorRange         string            `json:"color_range,omitempty"`
 	ColorSpace         string            `json:"color_space,omitempty"`
+	ColorTransfer      string            `json:"color_transfer,omitempty"`
+	ColorPrimaries     string            `json:"color_primaries,omitempty"`
 	SampleFmt          string            `json:"sample_fmt,omitempty"`
 	SampleRate         string            `json:"sample_rate,omitempty"`
 	Channels           int               `json:"channels,omitempty"`
@@ -122,7 +124,7 @@ func (c *Chapter) EndTime() time.Duration {
 	return time.Duration(c.EndTimeSeconds * float64(time.Second))
 }
 
-// Name returns the value of the "title" tag of the chapter
+// Title returns the value of the "title" tag of the chapter
 func (c *Chapter) Title() string {
 	title, _ := c.TagList.GetString("title")
 	return title
