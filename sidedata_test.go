@@ -3,15 +3,21 @@ package ffprobe
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"os"
 	"os/exec"
 	"testing"
 	"time"
 )
 
+// Test constants for side data types
+const (
+	testStereo3DTypeSideBySide      = "side_by_side"
+	testSphericalProjectionEquirect = "equirectangular"
+)
+
 // Test asset paths with detailed characteristics
 const (
-	testAssetsDir = "assets"
 
 	// testAVIPath - Empty file (0 bytes)
 	// Used for: Error testing - invalid/corrupt file handling
@@ -394,7 +400,7 @@ func Test_SideDataList_FindSideData(t *testing.T) {
 
 	// Test not found case
 	_, err = sideDataList.FindSideData(SideDataTypeStereo3D)
-	if err != ErrSideDataNotFound {
+	if !errors.Is(err, ErrSideDataNotFound) {
 		t.Errorf("Expected ErrSideDataNotFound, got %v", err)
 	}
 }
@@ -593,9 +599,10 @@ func Test_SideDataList_Errors(t *testing.T) {
 	}
 
 	for _, tt := range tests {
+		tt := tt // Fix gosec G601: avoid implicit memory aliasing in for loop
 		t.Run(tt.name, func(t *testing.T) {
 			_, err := tt.getterFunc()
-			if err != tt.expectedErr {
+			if !errors.Is(err, tt.expectedErr) {
 				t.Errorf("Expected error %v, got %v", tt.expectedErr, err)
 			}
 		})
@@ -645,17 +652,17 @@ func Test_SideDataMarshalJSON(t *testing.T) {
 	}
 
 	for _, tt := range tests {
+		tt := tt // Fix gosec G601: avoid implicit memory aliasing in for loop
 		t.Run(tt.name, func(t *testing.T) {
 			// Call MarshalJSON directly on the SideData pointer
 			data, err := tt.sideData.MarshalJSON()
 			if err != nil {
 				t.Errorf("MarshalJSON failed: %v", err)
+				return
 			}
 			if len(data) == 0 {
 				t.Error("MarshalJSON returned empty data")
-			}
-
-			// Also test via json.Marshal which should call our custom MarshalJSON
+			} // Also test via json.Marshal which should call our custom MarshalJSON
 			data2, err := json.Marshal(&tt.sideData)
 			if err != nil {
 				t.Errorf("json.Marshal failed: %v", err)
@@ -705,7 +712,7 @@ func Test_FindUnknownSideData(t *testing.T) {
 	t.Run("not found", func(t *testing.T) {
 		var emptyList SideDataList
 		_, err := emptyList.FindUnknownSideData("NonExistent")
-		if err != ErrSideDataNotFound {
+		if !errors.Is(err, ErrSideDataNotFound) {
 			t.Errorf("Expected ErrSideDataNotFound, got %v", err)
 		}
 	})
@@ -727,7 +734,7 @@ func Test_FindUnknownSideData(t *testing.T) {
 
 		// Try to get DisplayMatrix as Unknown - should fail type assertion
 		_, err = sideDataList.FindUnknownSideData(SideDataTypeDisplayMatrix)
-		if err != ErrSideDataUnexpectedType {
+		if !errors.Is(err, ErrSideDataUnexpectedType) {
 			t.Errorf("Expected ErrSideDataUnexpectedType, got %v", err)
 		}
 	})
@@ -755,8 +762,8 @@ func Test_SideData_AllTypes(t *testing.T) {
 					t.Error("Failed to cast to SideDataStereo3D")
 					return
 				}
-				if stereo3D.Type != "side_by_side" {
-					t.Errorf("Expected type 'side_by_side', got %s", stereo3D.Type)
+				if stereo3D.Type != testStereo3DTypeSideBySide {
+					t.Errorf("Expected type %q, got %s", testStereo3DTypeSideBySide, stereo3D.Type)
 				}
 				if !stereo3D.Inverted {
 					t.Error("Expected inverted to be true")
@@ -779,8 +786,8 @@ func Test_SideData_AllTypes(t *testing.T) {
 					t.Error("Failed to cast to SideDataSphericalMapping")
 					return
 				}
-				if spherical.Projection != "equirectangular" {
-					t.Errorf("Expected projection 'equirectangular', got %s", spherical.Projection)
+				if spherical.Projection != testSphericalProjectionEquirect {
+					t.Errorf("Expected projection %q, got %s", testSphericalProjectionEquirect, spherical.Projection)
 				}
 				if spherical.Yaw != 90 {
 					t.Errorf("Expected yaw 90, got %d", spherical.Yaw)
@@ -1003,29 +1010,29 @@ func Test_FlexFloat_InvalidJSON(t *testing.T) {
 		wantErr  bool
 	}{
 		{
-			name:     "invalid fraction - division by zero",
-			input:    `"100/0"`,
-			expected: FlexFloat(0),
+			name:    "invalid fraction - division by zero",
+			input:   `"100/0"`,
+			wantErr: true, // Should error: cannot divide by zero
 		},
 		{
-			name:     "invalid fraction - non-numeric numerator",
-			input:    `"abc/100"`,
-			expected: FlexFloat(0),
+			name:    "invalid fraction - non-numeric numerator",
+			input:   `"abc/100"`,
+			wantErr: true, // Should error: cannot parse numerator
 		},
 		{
-			name:     "invalid fraction - non-numeric denominator",
-			input:    `"100/def"`,
-			expected: FlexFloat(0),
+			name:    "invalid fraction - non-numeric denominator",
+			input:   `"100/def"`,
+			wantErr: true, // Should error: cannot parse denominator
 		},
 		{
-			name:     "invalid fraction - malformed",
-			input:    `"100/200/300"`,
-			expected: FlexFloat(0),
+			name:    "invalid fraction - malformed",
+			input:   `"100/200/300"`,
+			wantErr: true, // Should error: malformed fraction
 		},
 		{
-			name:     "invalid string - not a number",
-			input:    `"not-a-number"`,
-			expected: FlexFloat(0),
+			name:    "invalid string - not a number",
+			input:   `"not-a-number"`,
+			wantErr: true, // Should error: not a valid number
 		},
 		{
 			name:    "malformed JSON - should error",
@@ -1099,6 +1106,8 @@ func Test_SideDataList_UnmarshalJSON_Error(t *testing.T) {
 }
 
 // Test_SideDataList_AllGetters tests all getter methods with actual data
+//
+//nolint:gocyclo // Test function with multiple subtests
 func Test_SideDataList_AllGetters(t *testing.T) {
 	jsonData := `[
 		{
@@ -1108,12 +1117,12 @@ func Test_SideDataList_AllGetters(t *testing.T) {
 		},
 		{
 			"side_data_type": "Stereo 3D",
-			"type": "side_by_side",
+			"type": "` + testStereo3DTypeSideBySide + `",
 			"inverted": false
 		},
 		{
 			"side_data_type": "Spherical Mapping",
-			"projection": "equirectangular",
+			"projection": "` + testSphericalProjectionEquirect + `",
 			"yaw": 180,
 			"pitch": 90,
 			"roll": 45
@@ -1169,8 +1178,8 @@ func Test_SideDataList_AllGetters(t *testing.T) {
 		if s3d == nil {
 			t.Fatal("Stereo3D is nil")
 		}
-		if s3d.Type != "side_by_side" {
-			t.Errorf("Expected type 'side_by_side', got %s", s3d.Type)
+		if s3d.Type != testStereo3DTypeSideBySide {
+			t.Errorf("Expected type %q, got %s", testStereo3DTypeSideBySide, s3d.Type)
 		}
 		if s3d.Inverted {
 			t.Error("Expected inverted to be false")
@@ -1186,8 +1195,8 @@ func Test_SideDataList_AllGetters(t *testing.T) {
 		if sm == nil {
 			t.Fatal("SphericalMapping is nil")
 		}
-		if sm.Projection != "equirectangular" {
-			t.Errorf("Expected projection 'equirectangular', got %s", sm.Projection)
+		if sm.Projection != testSphericalProjectionEquirect {
+			t.Errorf("Expected projection %q, got %s", testSphericalProjectionEquirect, sm.Projection)
 		}
 		if sm.Yaw != 180 {
 			t.Errorf("Expected yaw 180, got %d", sm.Yaw)
@@ -1338,10 +1347,11 @@ func Test_SideDataList_TypeMismatch(t *testing.T) {
 	}
 
 	for _, tt := range tests {
+		tt := tt // Fix gosec G601: avoid implicit memory aliasing in for loop
 		t.Run(tt.name, func(t *testing.T) {
 			list := SideDataList{tt.sideData}
 			_, err := tt.getterFunc(list)
-			if err != tt.expectedErr {
+			if !errors.Is(err, tt.expectedErr) {
 				t.Errorf("Expected error %v, got %v", tt.expectedErr, err)
 			}
 		})

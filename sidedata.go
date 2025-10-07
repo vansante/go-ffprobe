@@ -101,8 +101,7 @@ func (f *FlexFloat) UnmarshalJSON(b []byte) error {
 	// Try parsing as plain string number
 	floatVal, err := strconv.ParseFloat(strVal, 64)
 	if err != nil {
-		*f = 0 // Default to 0 if we can't parse
-		return nil
+		return err
 	}
 	*f = FlexFloat(floatVal)
 	return nil
