@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"os/exec"
+	"runtime"
 	"strings"
 	"testing"
 	"time"
@@ -50,7 +52,12 @@ func Test_ProbeURL_HTTP(t *testing.T) {
 	// Serve all files in assets
 	go func() {
 		http.Handle("/", http.FileServer(http.Dir("./assets")))
-		err := http.ListenAndServe(fmt.Sprintf(":%d", testPort), nil) //nolint:gosec
+		host := ""
+		if runtime.GOOS == "darwin" {
+			host = "localhost" // macOS has security popups when not using localhost
+		}
+
+		err := http.ListenAndServe(fmt.Sprintf("%s:%d", host, testPort), nil) //nolint:gosec
 		t.Log(err)
 	}()
 
@@ -236,5 +243,39 @@ func Test_ProbeSideData(t *testing.T) {
 
 	if sideData.Rotation != -180 {
 		t.Errorf("Expected rotation to be -180, got %d", sideData.Rotation)
+	}
+}
+
+func Test_runProbe_InvalidJSON(t *testing.T) {
+	// Create a command that outputs invalid JSON
+	ctx, cancelFn := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancelFn()
+
+	// Use echo to output invalid JSON
+	cmd := exec.CommandContext(ctx, "echo", "invalid json output")
+
+	_, err := runProbe(cmd)
+	if err == nil {
+		t.Error("Expected error for invalid JSON output")
+	}
+	if !strings.Contains(err.Error(), "error parsing ffprobe output") {
+		t.Errorf("Expected JSON parsing error, got: %v", err)
+	}
+}
+
+func Test_runProbe_NoFormat(t *testing.T) {
+	// Create a command that outputs valid JSON but without format data
+	ctx, cancelFn := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancelFn()
+
+	// Use echo to output JSON without format
+	cmd := exec.CommandContext(ctx, "echo", `{"streams": []}`)
+
+	_, err := runProbe(cmd)
+	if err == nil {
+		t.Error("Expected error for missing format data")
+	}
+	if !strings.Contains(err.Error(), "no format data found") {
+		t.Errorf("Expected 'no format data found' error, got: %v", err)
 	}
 }
