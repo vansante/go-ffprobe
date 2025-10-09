@@ -1,30 +1,39 @@
-on: [push, pull_request]
+on: [ push, pull_request ]
 name: Test
 jobs:
   test:
     strategy:
       matrix:
-        go-version: [1.25.x]
-        os: [ubuntu-latest]
+        go-version: [ 1.25.x ]
+        os: [ ubuntu-latest ]
     runs-on: ${{ matrix.os }}
 
     steps:
-      - uses: FedericoCarboni/setup-ffmpeg@v3.1
-        id: setup-ffmpeg
-        with:
-          # A specific version to download, may also be "release" or a specific version
-          # like "6.1.0". At the moment semver specifiers (i.e. >=6.1.0) are supported
-          # only on Windows, on other platforms they are allowed but version is matched
-          # exactly regardless.
-          ffmpeg-version: release
+    - name: Checkout code
+      uses: actions/checkout@v4
 
-      - name:   Install Go
-        uses:   actions/setup-go@v4
-        with:
-          go-version: ${{ matrix.go-version }}
+    - name: Install Go
+      uses: actions/setup-go@v4
+      with:
+        go-version: ${{ matrix.go-version }}
 
-      - name:   Checkout code
-        uses:   actions/checkout@v4
+    - name: Install FFmpeg
+      run: |
+        # Install newer FFmpeg from official static builds - more reliable than third-party actions
+        sudo apt-get update
+        sudo apt-get install -y wget xz-utils
 
-      - name:   Test
-        run:    go test -v -timeout 2m ./...
+        # Download FFmpeg 7.0 static build (stable, no segfault issues)
+        cd /tmp
+        wget -q https://johnvansickle.com/ffmpeg/releases/ffmpeg-7.0-amd64-static.tar.xz
+        tar -xf ffmpeg-7.0-amd64-static.tar.xz
+        sudo cp ffmpeg-7.0-amd64-static/ffmpeg /usr/local/bin/
+        sudo cp ffmpeg-7.0-amd64-static/ffprobe /usr/local/bin/
+        sudo chmod +x /usr/local/bin/ffmpeg /usr/local/bin/ffprobe
+
+        # Verify installation
+        ffmpeg -version
+        ffprobe -version
+
+    - name: Test
+      run: go test -v -timeout 2m ./...
