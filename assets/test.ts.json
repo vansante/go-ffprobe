@@ -58,7 +58,27 @@
                 "dependent": 0,
                 "still_image": 0,
                 "multilayer": 0
-            }
+            },
+            "side_data_list": [
+                {
+                    "side_data_type": "Mastering display metadata",
+                    "red_x": "34000/50000",
+                    "red_y": "16000/50000",
+                    "green_x": "13250/50000",
+                    "green_y": "34500/50000",
+                    "blue_x": "7500/50000",
+                    "blue_y": "3000/50000",
+                    "white_point_x": "15635/50000",
+                    "white_point_y": "16450/50000",
+                    "min_luminance": "500/10000",
+                    "max_luminance": "12000000/10000"
+                },
+                {
+                    "side_data_type": "Content light level metadata",
+                    "max_content": 1000,
+                    "max_average": 300
+                }
+            ]
         }
     ],
     "format": {
