@@ -35,5 +35,49 @@ jobs:
         ffmpeg -version
         ffprobe -version
 
+    - name: Debug Runner Environment
+      run: |
+        echo "=== Runner Environment Debug Info ==="
+        echo "OS Info:"
+        uname -a
+        cat /etc/os-release
+        echo
+        echo "Memory Info:"
+        free -h
+        echo
+        echo "CPU Info:"
+        lscpu | head -20
+        echo
+        echo "Available space:"
+        df -h /tmp
+        echo
+        echo "FFmpeg/FFprobe paths and versions:"
+        which ffmpeg
+        which ffprobe
+        ls -la /usr/local/bin/ffmpeg /usr/local/bin/ffprobe
+        echo
+        echo "Test file info:"
+        ls -la assets/
+        echo
+        echo "HDR test file details:"
+        if [ -f "assets/test.ts" ]; then
+          file assets/test.ts
+          stat assets/test.ts
+          echo "Attempting basic ffprobe on HDR file (without JSON):"
+          timeout 10 ffprobe assets/test.ts 2>&1 || echo "Basic ffprobe failed with exit code $?"
+          echo
+          echo "Attempting JSON ffprobe on HDR file:"
+          timeout 10 ffprobe -v quiet -print_format json -show_format -show_streams assets/test.ts 2>&1 || echo "JSON ffprobe failed with exit code $?"
+        else
+          echo "HDR test file not found"
+        fi
+        echo
+        echo "Kernel and system limits:"
+        ulimit -a
+        echo
+        echo "Available libraries:"
+        ldd /usr/local/bin/ffprobe | head -10
+        echo "=== End Debug Info ==="
+
     - name: Test
       run: go test -v -timeout 2m ./...
