@@ -3,6 +3,8 @@ package ffprobe
 import (
 	"encoding/json"
 	"errors"
+	"strconv"
+	"strings"
 )
 
 var (
@@ -64,19 +66,62 @@ type SideDataSkipSamples struct {
 	DiscardReason  int `json:"discard_reason"`
 }
 
+// FlexFloat handles JSON values that can be numeric, string, or fractional strings.
+// FFmpeg/ffprobe outputs HDR metadata values as fractions (e.g., "34000/50000")
+// to preserve exact precision. This type converts them to float64 for API consumers.
+type FlexFloat float64
+
+func (f *FlexFloat) UnmarshalJSON(b []byte) error {
+	// Try unmarshaling as float64 first (handles both int and float JSON numbers)
+	var floatVal float64
+	if err := json.Unmarshal(b, &floatVal); err == nil {
+		*f = FlexFloat(floatVal)
+		return nil
+	}
+
+	// Try as string (fraction or plain number)
+	var strVal string
+	if err := json.Unmarshal(b, &strVal); err != nil {
+		return err
+	}
+
+	// Handle fraction format "34000/50000"
+	if strings.Contains(strVal, "/") {
+		parts := strings.Split(strVal, "/")
+		if len(parts) == 2 {
+			num, err1 := strconv.ParseFloat(parts[0], 64)
+			denom, err2 := strconv.ParseFloat(parts[1], 64)
+			if err1 == nil && err2 == nil && denom != 0 {
+				*f = FlexFloat(num / denom)
+				return nil
+			}
+		}
+	}
+
+	// Try parsing as plain string number
+	floatVal, err := strconv.ParseFloat(strVal, 64)
+	if err != nil {
+		return err
+	}
+	*f = FlexFloat(floatVal)
+	return nil
+}
+
 // SideDataMasteringDisplayMetadata represents the mastering display metadata side data.
+// All chromaticity coordinates (red, green, blue, white point) are in the range [0.0, 1.0].
+// Luminance values are in cd/m² (nits), typically 0.0001-10000 for min, 100-10000 for max.
 type SideDataMasteringDisplayMetadata struct {
 	SideDataBase
-	RedX         int `json:"red_x,omitempty"`
-	RedY         int `json:"red_y,omitempty"`
-	GreenX       int `json:"green_x,omitempty"`
-	GreenY       int `json:"green_y,omitempty"`
-	BlueX        int `json:"blue_x,omitempty"`
-	BlueY        int `json:"blue_y,omitempty"`
-	WhitePointX  int `json:"white_point_x,omitempty"`
-	WhitePointY  int `json:"white_point_y,omitempty"`
-	MinLuminance int `json:"min_luminance,omitempty"`
-	MaxLuminance int `json:"max_luminance,omitempty"`
+	RedX         FlexFloat `json:"red_x,omitempty"`
+	RedY         FlexFloat `json:"red_y,omitempty"`
+	GreenX       FlexFloat `json:"green_x,omitempty"`
+	GreenY       FlexFloat `json:"green_y,omitempty"`
+	BlueX        FlexFloat `json:"blue_x,omitempty"`
+	BlueY        FlexFloat `json:"blue_y,omitempty"`
+	WhitePointX  FlexFloat `json:"white_point_x,omitempty"`
+	WhitePointY  FlexFloat `json:"white_point_y,omitempty"`
+	MinLuminance FlexFloat `json:"min_luminance,omitempty"`
+	MaxLuminance FlexFloat `json:"max_luminance,omitempty"`
 }
 
 // SideDataContentLightLevel represents the content light level side data.
