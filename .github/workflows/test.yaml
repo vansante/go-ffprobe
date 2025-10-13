@@ -1,26 +1,30 @@
-on: [ push, pull_request ]
+on: [push, pull_request]
 name: Test
 jobs:
   test:
     strategy:
       matrix:
-        go-version: [ 1.25.x ]
-        os: [ ubuntu-latest ]
+        go-version: [1.25.x]
+        os: [ubuntu-latest]
     runs-on: ${{ matrix.os }}
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+      - uses: FedericoCarboni/setup-ffmpeg@v3.1
+        id: setup-ffmpeg
+        with:
+          # A specific version to download, may also be "release" or a specific version
+          # like "6.1.0". At the moment semver specifiers (i.e. >=6.1.0) are supported
+          # only on Windows, on other platforms they are allowed but version is matched
+          # exactly regardless.
+          ffmpeg-version: release
 
-    - name: Install Go
-      uses: actions/setup-go@v4
-      with:
-        go-version: ${{ matrix.go-version }}
+      - name:   Install Go
+        uses:   actions/setup-go@v4
+        with:
+          go-version: ${{ matrix.go-version }}
 
-    - name: Install FFmpeg
-      uses: FedericoCarboni/setup-ffmpeg@v3.1
-      with:
-        ffmpeg-version: release
+      - name:   Checkout code
+        uses:   actions/checkout@v4
 
-    - name: Test
-      run: go test -v -timeout 2m ./...
+      - name:   Test
+        run:    go test -v -timeout 2m ./...
