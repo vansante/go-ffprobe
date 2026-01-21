@@ -27,6 +27,13 @@ type ProbeData struct {
 	Streams  []*Stream  `json:"streams"`
 	Format   *Format    `json:"format"`
 	Chapters []*Chapter `json:"chapters"`
+	Frames   []*Frame   `json:"frames"`
+}
+
+type Frame struct {
+	PtsTime      string       `json:"pts_time"`
+	TagList      Tags         `json:"tags"`
+	SideDataList SideDataList `json:"side_data_list,omitempty"`
 }
 
 // Format is a json data structure to represent formats

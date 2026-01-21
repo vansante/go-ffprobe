@@ -23,10 +23,16 @@ const (
 	SideDataTypeSkipSamples              = "Skip Samples"
 	SideDataTypeMasteringDisplayMetadata = "Mastering display metadata"
 	SideDataTypeContentLightLevel        = "Content light level metadata"
+	SideDataTypeGOPTimecode              = "GOP timecode"
 )
 
 type SideDataBase struct {
 	Type string `json:"side_data_type"`
+}
+
+type SideDataGOPTimecode struct {
+	SideDataBase
+	Timecode string `json:"timecode"`
 }
 
 // SideDataDisplayMatrix represents the display matrix side data.
@@ -165,6 +171,8 @@ func (sd *SideData) UnmarshalJSON(b []byte) error {
 		sd.Data = new(SideDataMasteringDisplayMetadata)
 	case SideDataTypeContentLightLevel:
 		sd.Data = new(SideDataContentLightLevel)
+	case SideDataTypeGOPTimecode:
+		sd.Data = new(SideDataGOPTimecode)
 	default:
 		sd.Data = new(SideDataUnknown)
 	}
@@ -309,6 +317,20 @@ func (s *SideDataList) GetContentLightLevel() (*SideDataContentLightLevel, error
 		return nil, ErrSideDataUnexpectedType
 	}
 	return contentLightLevel, nil
+}
+
+// GetContentLightLevel retrieves the ContentLightLevel from the SideData. If the ContentLightLevel is not found or
+// the SideData is of the wrong type, an error is returned.
+func (s *SideDataList) GetGOPTimecode() (*SideDataGOPTimecode, error) {
+	data, found := s.findSideDataByName(SideDataTypeGOPTimecode)
+	if !found {
+		return nil, ErrSideDataNotFound
+	}
+	gopTimecode, ok := data.(*SideDataGOPTimecode)
+	if !ok {
+		return nil, ErrSideDataUnexpectedType
+	}
+	return gopTimecode, nil
 }
 
 func (s *SideDataList) findSideDataByName(sideDataType string) (interface{}, bool) {
