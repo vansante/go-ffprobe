@@ -33,7 +33,7 @@ type ProbeData struct {
 type Frame struct {
 	MediaType               string       `json:"media_type"`
 	StreamIndex             int          `json:"stream_index,omitempty"`
-	KeyFrame                int          `json:"key_frame,omitempty"`
+	KeyFrame                int          `json:"key_frame"`
 	Pts                     int          `json:"pts"`
 	PtsTime                 string       `json:"pts_time"`
 	PktDts                  int          `json:"pkt_dts,omitempty"`
@@ -197,7 +197,7 @@ func (p *ProbeData) GetKeyframes() (frames []Frame) {
 		if f == nil {
 			continue
 		}
-		if f.PictType == "I" {
+		if f.KeyFrame == 1 {
 			frames = append(frames, *f)
 		}
 	}
