@@ -41,4 +41,7 @@ func main() {
 
 	log.Printf("\nDuration: %v\n", data.Format.Duration())
 	log.Printf("\nStartTime: %v\n", data.Format.StartTime())
+
+	keyFrames := data.GetKeyframes()
+	log.Printf("\nFirst Keyframe: %v", keyFrames[0].BestEffortTimestampTime)
 }
