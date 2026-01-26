@@ -42,7 +42,7 @@ func main() {
 	log.Printf("\nDuration: %v\n", data.Format.Duration())
 	log.Printf("\nStartTime: %v\n", data.Format.StartTime())
 
-	//Nil by default; Add "-show_frames" as an extra ffprobe argument to ProbeURL to view data
+	// Nil by default; Add "-show_frames" as an extra ffprobe argument to ProbeURL to view data
 	if data.Frames != nil {
 		keyFrames := data.GetKeyframes()
 		log.Printf("\nFirst Keyframe: %v", keyFrames[0].BestEffortTimestampTime)
