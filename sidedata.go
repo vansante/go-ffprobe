@@ -3,6 +3,7 @@ package ffprobe
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"strconv"
 	"strings"
 )
@@ -24,10 +25,20 @@ const (
 	SideDataTypeMasteringDisplayMetadata = "Mastering display metadata"
 	SideDataTypeContentLightLevel        = "Content light level metadata"
 	SideDataTypeGOPTimecode              = "GOP timecode"
+	SideDataTypeCPBProperties            = "CPB properties"
 )
 
 type SideDataBase struct {
 	Type string `json:"side_data_type"`
+}
+
+type SideDataCPBProperties struct {
+	SideDataBase
+	MaxBitrate int     `json:"max_bitrate"`
+	MinBitrate int     `json:"min_bitrate"`
+	AvgBitrate int     `json:"avg_bitrate"`
+	BufferSize int     `json:"buffer_size"`
+	VbvDelay   FlexInt `json:"vbv_delay"`
 }
 
 type SideDataGOPTimecode struct {
@@ -70,6 +81,37 @@ type SideDataSkipSamples struct {
 	DiscardPadding int `json:"discard_padding"`
 	SkipReason     int `json:"skip_reason"`
 	DiscardReason  int `json:"discard_reason"`
+}
+
+// FlexInt follows a similar procedure to FlexFloat however is a little more generic.
+// Attributes like VbvDelay are either an Int or a String so we need a way to simply
+// parse either an int or a string which FlexFloat doesn't facilitate. This is mainly
+// used for VbvDelay as the Int is a valid value where-as the string means an invalid
+// response - but I wanted to keep this flexible for future attributes.
+type FlexInt struct {
+	IntValue    *int
+	StringValue *string
+}
+
+func (f *FlexInt) UnmarshalJSON(b []byte) error {
+	// Int is the valid value so we will attempt this first
+	var intVal int
+	if err := json.Unmarshal(b, &intVal); err == nil {
+		f.IntValue = &intVal
+		f.StringValue = nil
+		return nil
+	}
+
+	// Otherwise, try parsing into a string
+	var strVal string
+	if err := json.Unmarshal(b, &strVal); err == nil {
+		f.StringValue = &strVal
+		f.IntValue = nil
+		return nil
+	}
+
+	// Neither data types worked so return an error
+	return fmt.Errorf("Could not parse int or string, got %s", b)
 }
 
 // FlexFloat handles JSON values that can be numeric, string, or fractional strings.
@@ -173,6 +215,8 @@ func (sd *SideData) UnmarshalJSON(b []byte) error {
 		sd.Data = new(SideDataContentLightLevel)
 	case SideDataTypeGOPTimecode:
 		sd.Data = new(SideDataGOPTimecode)
+	case SideDataTypeCPBProperties:
+		sd.Data = new(SideDataCPBProperties)
 	default:
 		sd.Data = new(SideDataUnknown)
 	}
@@ -319,7 +363,7 @@ func (s *SideDataList) GetContentLightLevel() (*SideDataContentLightLevel, error
 	return contentLightLevel, nil
 }
 
-// GetContentLightLevel retrieves the ContentLightLevel from the SideData. If the ContentLightLevel is not found or
+// GetGOPTimecode retrieves the GOPTimecode from the SideData. If the GOPTimecode is not found or
 // the SideData is of the wrong type, an error is returned.
 func (s *SideDataList) GetGOPTimecode() (*SideDataGOPTimecode, error) {
 	data, found := s.findSideDataByName(SideDataTypeGOPTimecode)
@@ -331,6 +375,20 @@ func (s *SideDataList) GetGOPTimecode() (*SideDataGOPTimecode, error) {
 		return nil, ErrSideDataUnexpectedType
 	}
 	return gopTimecode, nil
+}
+
+// GetCPBProperties retrieves the CPBProperties from the SideData. If the CPBProperties is not found or
+// the SideData is of the wrong type, an error is returned.
+func (s *SideDataList) GetCPBProperties() (*SideDataCPBProperties, error) {
+	data, found := s.findSideDataByName(SideDataTypeCPBProperties)
+	if !found {
+		return nil, ErrSideDataNotFound
+	}
+	cpbProperties, ok := data.(*SideDataCPBProperties)
+	if !ok {
+		return nil, ErrSideDataUnexpectedType
+	}
+	return cpbProperties, nil
 }
 
 func (s *SideDataList) findSideDataByName(sideDataType string) (interface{}, bool) {

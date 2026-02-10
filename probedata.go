@@ -28,6 +28,19 @@ type ProbeData struct {
 	Format   *Format    `json:"format"`
 	Chapters []*Chapter `json:"chapters"`
 	Frames   []*Frame   `json:"frames"`
+	Packets  []*Packet  `json:"packets"`
+}
+
+type Packet struct {
+	CodecType    string `json:"codec_type"`
+	StreamIndex  int    `json:"stream_index"`
+	Pts          int    `json:"pts"`
+	PtsTime      string `json:"pts_time"`
+	Duration     int    `json:"duration"`
+	DurationTime string `json:"duration_time"`
+	Size         string `json:"size"`
+	Pos          string `json:"pos"`
+	Flags        string `json:"flags"`
 }
 
 type Frame struct {
