@@ -36,6 +36,8 @@ type Packet struct {
 	StreamIndex  int    `json:"stream_index"`
 	Pts          int    `json:"pts"`
 	PtsTime      string `json:"pts_time"`
+	Dts          int    `json:"dts"`
+	DtsTime      string `json:"dts_time"`
 	Duration     int    `json:"duration"`
 	DurationTime string `json:"duration_time"`
 	Size         string `json:"size"`
@@ -202,6 +204,30 @@ func (p *ProbeData) StreamType(streamType StreamType) (streams []Stream) {
 		}
 	}
 	return streams
+}
+
+func (p *ProbeData) GetAudioPackets() (packets []Packet) {
+	for _, pac := range p.Packets {
+		if pac == nil {
+			continue
+		}
+		if pac.CodecType == "audio" {
+			packets = append(packets, *pac)
+		}
+	}
+	return packets
+}
+
+func (p *ProbeData) GetVideoPackets() (packets []Packet) {
+	for _, pac := range p.Packets {
+		if pac == nil {
+			continue
+		}
+		if pac.CodecType == "video" {
+			packets = append(packets, *pac)
+		}
+	}
+	return packets
 }
 
 // GetKeyframes returns all Keyframes

@@ -20,7 +20,7 @@ func main() {
 	ctx, cancelFn := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancelFn()
 
-	data, err := ffprobe.ProbeURL(ctx, path)
+	data, err := ffprobe.ProbeURL(ctx, path, "-show_packets")
 	if err != nil {
 		log.Panicf("Error getting data: %v", err)
 	}
