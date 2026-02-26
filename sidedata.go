@@ -111,7 +111,7 @@ func (f *FlexInt) UnmarshalJSON(b []byte) error {
 	}
 
 	// Neither data types worked so return an error
-	return fmt.Errorf("Could not parse int or string, got %s", b)
+	return fmt.Errorf("could not parse int or string, got %s", b)
 }
 
 // FlexFloat handles JSON values that can be numeric, string, or fractional strings.
