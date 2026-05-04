@@ -3,6 +3,7 @@ package ffprobe
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"strconv"
 	"strings"
 )
@@ -39,8 +40,8 @@ type SideDataDisplayMatrix struct {
 // SideDataStereo3D represents the stereo 3D side data.
 type SideDataStereo3D struct {
 	SideDataBase
-	Type     string `json:"type"`
-	Inverted bool   `json:"inverted"`
+	Type     string   `json:"type"`
+	Inverted FlexBool `json:"inverted"`
 }
 
 // SideDataSphericalMapping represents the spherical mapping side data.
@@ -318,4 +319,41 @@ func (s *SideDataList) findSideDataByName(sideDataType string) (interface{}, boo
 		}
 	}
 	return nil, false
+}
+
+// FlexBool - handles JSON values that can be boolean, numeric (0 or 1), or string representations of boolean values ("true", "false", "yes", "no", "1", "0").
+type FlexBool bool
+
+func (fb *FlexBool) UnmarshalJSON(b []byte) error {
+	var bo bool
+	if err := json.Unmarshal(b, &bo); err == nil {
+		*fb = FlexBool(bo)
+
+		return nil
+	}
+
+	var num int
+	if err := json.Unmarshal(b, &num); err == nil {
+		*fb = num != 0
+
+		return nil
+	}
+
+	var s string
+	if err := json.Unmarshal(b, &s); err == nil {
+		s = strings.ToLower(s)
+		if s == "1" || s == "true" || s == "yes" {
+			*fb = true
+
+			return nil
+		}
+
+		if s == "0" || s == "false" || s == "no" {
+			*fb = false
+
+			return nil
+		}
+	}
+
+	return fmt.Errorf("cannot unmarshal %s into FlexBool: %w", string(b), ErrSideDataUnexpectedType)
 }
