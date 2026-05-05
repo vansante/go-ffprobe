@@ -1454,3 +1454,56 @@ func Test_SideDataList_TypeMismatch(t *testing.T) {
 		})
 	}
 }
+
+func Test_FlexBool_UnmarshalJSON_Integer(t *testing.T) {
+	tests := []struct {
+		name     string
+		input    string
+		expected FlexBool
+	}{
+		{
+			name:     "positive integer",
+			input:    `1`,
+			expected: FlexBool(true),
+		},
+		{
+			name:     "zero",
+			input:    `0`,
+			expected: FlexBool(false),
+		},
+		{
+			name:     "true",
+			input:    `true`,
+			expected: FlexBool(true),
+		},
+		{
+			name:     "false",
+			input:    `false`,
+			expected: FlexBool(false),
+		},
+		{
+			name:     "string bool false",
+			input:    `"false"`,
+			expected: FlexBool(false),
+		},
+
+		{
+			name:     "string bool true",
+			input:    `"true"`,
+			expected: FlexBool(true),
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			var result FlexBool
+			err := json.Unmarshal([]byte(tt.input), &result)
+			if err != nil {
+				t.Errorf("Unexpected error: %v", err)
+			}
+			if result != tt.expected {
+				t.Errorf("Expected %v, got %v", tt.expected, result)
+			}
+		})
+	}
+}
