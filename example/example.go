@@ -20,7 +20,7 @@ func main() {
 	ctx, cancelFn := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancelFn()
 
-	data, err := ffprobe.ProbeURL(ctx, path)
+	data, err := ffprobe.ProbeURL(ctx, path, "-show_packets")
 	if err != nil {
 		log.Panicf("Error getting data: %v", err)
 	}
@@ -41,4 +41,10 @@ func main() {
 
 	log.Printf("\nDuration: %v\n", data.Format.Duration())
 	log.Printf("\nStartTime: %v\n", data.Format.StartTime())
+
+	// Nil by default; Add "-show_frames" as an extra ffprobe argument to ProbeURL to view data
+	if data.Frames != nil {
+		keyFrames := data.GetKeyframes()
+		log.Printf("\nFirst Keyframe: %v", keyFrames[0].BestEffortTimestampTime)
+	}
 }

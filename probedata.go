@@ -27,6 +27,54 @@ type ProbeData struct {
 	Streams  []*Stream  `json:"streams"`
 	Format   *Format    `json:"format"`
 	Chapters []*Chapter `json:"chapters"`
+	Frames   []*Frame   `json:"frames"`
+	Packets  []*Packet  `json:"packets"`
+}
+
+type Packet struct {
+	CodecType    string `json:"codec_type"`
+	StreamIndex  int    `json:"stream_index"`
+	Pts          int    `json:"pts"`
+	PtsTime      string `json:"pts_time"`
+	Dts          int    `json:"dts"`
+	DtsTime      string `json:"dts_time"`
+	Duration     int    `json:"duration"`
+	DurationTime string `json:"duration_time"`
+	Size         string `json:"size"`
+	Pos          string `json:"pos"`
+	Flags        string `json:"flags"`
+}
+
+type Frame struct {
+	MediaType               string       `json:"media_type"`
+	StreamIndex             int          `json:"stream_index,omitempty"`
+	KeyFrame                int          `json:"key_frame"`
+	Pts                     int          `json:"pts"`
+	PtsTime                 string       `json:"pts_time"`
+	PktDts                  int          `json:"pkt_dts,omitempty"`
+	PktDtsTime              string       `json:"pkt_dts_time,omitempty"`
+	BestEffortTimestamp     int          `json:"best_effort_timestamp,omitempty"`
+	BestEffortTimestampTime string       `json:"best_effort_timestamp_time,omitempty"`
+	Duration                int          `json:"duration,omitempty"`
+	DurationTime            string       `json:"duration_time,omitempty"`
+	PktPos                  string       `json:"pkt_pos,omitempty"`
+	PktSize                 string       `json:"pkt_size,omitempty"`
+	Width                   int          `json:"width,omitempty"`
+	Height                  int          `json:"height,omitempty"`
+	CropTop                 int          `json:"crop_top,omitempty"`
+	CropBottom              int          `json:"crop_bottom,omitempty"`
+	CropLeft                int          `json:"crop_left,omitempty"`
+	CropRight               int          `json:"crop_right,omitempty"`
+	PixFmt                  string       `json:"pix_fmt,omitempty"`
+	SampleAspectRatio       string       `json:"sample_aspect_ratio,omitempty"`
+	PictType                string       `json:"pict_type,omitempty"`
+	InterlacedFrame         int          `json:"interlaced_frame,omitempty"`
+	TopFieldFirst           int          `json:"top_field_first,omitempty"`
+	RepeatPict              int          `json:"repeat_pict,omitempty"`
+	ColorRange              string       `json:"color_range,omitempty"`
+	ChromaLocation          string       `json:"chroma_location,omitempty"`
+	TagList                 Tags         `json:"tags"`
+	SideDataList            SideDataList `json:"side_data_list,omitempty"`
 }
 
 // Format is a json data structure to represent formats
@@ -156,6 +204,43 @@ func (p *ProbeData) StreamType(streamType StreamType) (streams []Stream) {
 		}
 	}
 	return streams
+}
+
+func (p *ProbeData) GetAudioPackets() (packets []Packet) {
+	for _, pac := range p.Packets {
+		if pac == nil {
+			continue
+		}
+		if pac.CodecType == "audio" {
+			packets = append(packets, *pac)
+		}
+	}
+	return packets
+}
+
+func (p *ProbeData) GetVideoPackets() (packets []Packet) {
+	for _, pac := range p.Packets {
+		if pac == nil {
+			continue
+		}
+		if pac.CodecType == "video" {
+			packets = append(packets, *pac)
+		}
+	}
+	return packets
+}
+
+// GetKeyframes returns all Keyframes
+func (p *ProbeData) GetKeyframes() (frames []Frame) {
+	for _, f := range p.Frames {
+		if f == nil {
+			continue
+		}
+		if f.KeyFrame == 1 {
+			frames = append(frames, *f)
+		}
+	}
+	return frames
 }
 
 // FirstVideoStream returns the first video stream found
