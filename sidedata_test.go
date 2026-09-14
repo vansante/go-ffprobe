@@ -331,6 +331,51 @@ func Test_SideDataContentLightLevel(t *testing.T) {
 	}
 }
 
+func Test_SideDataGOPTimecode(t *testing.T) {
+	jsonData := `{ "side_data_type": "GOP timecode",
+	"timecode": "00:00:00:00" }`
+
+	var metadata SideDataGOPTimecode
+	err := json.Unmarshal([]byte(jsonData), &metadata)
+	if err != nil {
+		t.Fatalf("Failed to unmarshal: %v", err)
+	}
+
+	if metadata.Timecode != "00:00:00:00" {
+		t.Errorf("Timecode: Expected 00:00:00:00, got %s", metadata.Timecode)
+	}
+}
+
+func Test_SideDataCPBProperties(t *testing.T) {
+	jsonData := `{ "side_data_type": "CPB properties", 
+	"max_bitrate": 15000000, 
+	"min_bitrate": 0, 
+	"avg_bitrate": 0, 
+	"buffer_size": 7995392, 
+	"vbv_delay": -1 }`
+
+	var props SideDataCPBProperties
+	err := json.Unmarshal([]byte(jsonData), &props)
+	if err != nil {
+		t.Fatalf("Failed to unmarshal: %v", err)
+	}
+	if props.MaxBitrate != 15000000 {
+		t.Errorf("MaxBitrate: Expected 15000000, got %d", props.MaxBitrate)
+	}
+	if props.MinBitrate != 0 {
+		t.Errorf("MinBitrate: Expected 0, got %d", props.MinBitrate)
+	}
+	if props.AvgBitrate != 0 {
+		t.Errorf("AvgBitrate: Expected 0, got %d", props.AvgBitrate)
+	}
+	if props.BufferSize != 7995392 {
+		t.Errorf("BufferSize: Expected 7995392, got %d", props.BufferSize)
+	}
+	if *props.VbvDelay.IntValue != -1 {
+		t.Errorf("VBVDelay: Expected -1, got %d", props.VbvDelay.IntValue)
+	}
+}
+
 func Test_SideDataList_UnmarshalJSON(t *testing.T) {
 	jsonData := `[
 		{
